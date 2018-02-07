@@ -1,0 +1,4 @@
+---
+- name: docker group warning
+  debug:
+    msg: You should restart your shell or graphical environment to apply group changes
