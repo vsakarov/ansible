@@ -1,0 +1,35 @@
+---
+- name: Install editors
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - emacs
+    - neovim
+    - silversearcher-ag
+    - vim
+    - vim-fugitive
+  tags: packages
+
+- name: Clone spacemacs
+  git:
+    repo: https://github.com/syl20bnr/spacemacs
+    dest: "{{ first_user.home }}/.emacs.d"
+    update: no
+  become: yes
+  become_user: "{{ first_user.name }}"
+  tags: spacemacs, configuration
+
+- name: Download .spacemacs
+  get_url:
+    url: "{{ dot_spacemacs_url }}"
+    dest: "{{ first_user.home }}/.spacemacs"
+    owner: "{{ first_user.name }}"
+    group: "{{ first_user.name }}"
+    force: no
+  tags: spacemacs, configuration
+
+- name: Set vim as default editor
+  alternatives:
+    name: editor
+    path: /usr/bin/vim.basic
+  tags: configuration
