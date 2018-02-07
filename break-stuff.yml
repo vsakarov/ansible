@@ -5,6 +5,7 @@
   roles:
     - { role: docker-install, tags: ['docker-install', 'docker'] }
     - { role: editors, tags: editors }
+    - { role: git, tags: git }
   tasks:
     - debug:
         msg: All done, have a nice day
