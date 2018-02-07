@@ -1,0 +1,20 @@
+galaxy_info:
+  author: Vasil Sakarov
+  description: Set variable with the name of the user with id 1000. On most unix systems this is the first created user.
+
+  issue_tracker_url: https://github.com/vsakarov/ansible/issues
+
+  license: MIT
+
+  min_ansible_version: 2.0
+
+  platforms:
+  - name: Ubuntu
+    versions:
+    - zesty
+    - artful
+
+  galaxy_tags:
+    - desktop
+
+dependencies: []
