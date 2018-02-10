@@ -1,11 +1,13 @@
 ---
-- name: Install editors
+- name: Install editors and dependencies
   apt:
     name: "{{ item }}"
   with_items:
     - emacs
     - neovim
     - silversearcher-ag
+    # sqlite3 is needed by emacs' helm-dash
+    - sqlite3
     - vim
     - vim-fugitive
   tags: packages

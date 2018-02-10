@@ -1,5 +1,5 @@
-Role Name
-=========
+Docker install
+==============
 
 Install docker and docker-compose from official docker repo.
 
@@ -22,7 +22,8 @@ Example Playbook
 ----------------
 
 ```yaml
-- hosts: local
+- hosts: localhost
+  connection: local
   roles:
     - { role: docker-install, tags: ['docker-install', 'docker'] }
 ```

@@ -15,7 +15,7 @@ galaxy_info:
     - artful
 
   galaxy_tags:
-    - docker
+    - git
 
 dependencies:
   - first_user

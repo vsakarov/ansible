@@ -1,4 +1,4 @@
-Role Name
+Editors
 =========
 
 Install emacs and vim editors with basic configuraions
@@ -22,7 +22,8 @@ Example Playbook
 ----------------
 
 ```yaml
-- hosts: local
+- hosts: localhost
+  connection: local
   roles:
     - { role: editors, tags: editors }
 ```

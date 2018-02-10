@@ -1,5 +1,5 @@
-Role Name
-=========
+Git
+===
 
 Configure git
 
@@ -22,7 +22,8 @@ Example Playbook
 ----------------
 
 ```yaml
-- hosts: local
+- hosts: localhost
+  connection: local
   roles:
     - { role: git, tags: git }
 ```

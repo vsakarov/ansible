@@ -1,5 +1,8 @@
+# sudo ansible-playbook break-stuff.yml --list-tags
+# sudo ansible-playbook break-stuff.yml --diff --tags XXXXX --check
 ---
-- hosts: local
+- hosts: localhost
+  connection: local
   become: yes
   gather_facts: no
   roles:

@@ -1,5 +1,5 @@
-Role Name
-=========
+First User
+==========
 
 Set variable with the name of the user with id 1000. On most unix systems this is the first created user.
 
@@ -17,7 +17,8 @@ Example Playbook
 ----------------
 
 ```yaml
-- hosts: local
+- hosts: localhost
+  connection: local
   roles:
     - first_user
   tasks:
