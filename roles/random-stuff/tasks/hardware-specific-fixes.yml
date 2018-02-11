@@ -1,0 +1,18 @@
+---
+- setup:
+  when: ansible_product_name is not defined
+  tags: packages
+
+# Fix painful pwm settings
+# https://wiki.archlinux.org/index.php/backlight#Backlight_PWM_modulation_frequency_.28Intel_i915_only.29
+# http://devbraindom.blogspot.bg/2013/03/eliminate-led-screen-flicker-with-intel.html
+- block:
+  - name: Install intel gpu tools
+    apt:
+      name: intel-gpu-tools
+    tags: packages
+
+  - name: Add cron job to set thinkpad x220 pwm setting every minute
+    cron: name='Increase LCD PWM rate' job='intel_reg read 0xC8254 | grep 12280000 && intel_reg write 0xC8254 0x3d103d1'
+    tags: configuration
+  when: ansible_product_name == '4291IR6' and ansible_product_version == 'ThinkPad X220'

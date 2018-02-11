@@ -1,0 +1,22 @@
+galaxy_info:
+  author: Vasil Sakarov
+  description: Sandbox role for stuff that still don't have separate role
+
+  issue_tracker_url: https://github.com/vsakarov/ansible/issues
+
+  license: MIT
+
+  min_ansible_version: 2.0
+
+  platforms:
+  - name: Ubuntu
+    versions:
+    - zesty
+    - artful
+
+  galaxy_tags:
+    - ssh
+    - firefox
+
+dependencies:
+  - first_user
