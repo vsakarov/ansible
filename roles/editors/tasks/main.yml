@@ -20,7 +20,9 @@
     update: no
   become: yes
   become_user: "{{ first_user.name }}"
-  tags: spacemacs, configuration
+  tags:
+    - configuration
+    - spacemacs
 
 - name: Download .spacemacs
   get_url:
@@ -29,7 +31,20 @@
     owner: "{{ first_user.name }}"
     group: "{{ first_user.name }}"
     force: no
-  tags: spacemacs, configuration
+  tags:
+    - configuration
+    - spacemacs
+
+- name: Download .vimrc
+  get_url:
+    url: "{{ dot_vimrc_url }}"
+    dest: "{{ first_user.home }}/.vimrc"
+    owner: "{{ first_user.name }}"
+    group: "{{ first_user.name }}"
+    force: no
+  tags:
+    - configuration
+    - vimrc
 
 - name: Set vim as default editor
   alternatives:
