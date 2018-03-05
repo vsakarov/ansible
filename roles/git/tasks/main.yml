@@ -2,6 +2,7 @@
 - name: Install git
   apt:
     name: git
+  become: yes
   tags: packages
 
 - name: Setup git config

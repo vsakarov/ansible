@@ -10,6 +10,7 @@
     - sqlite3
     - vim
     - vim-fugitive
+  become: yes
   tags: packages
 
 - name: Clone spacemacs

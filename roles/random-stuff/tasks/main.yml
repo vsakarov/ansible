@@ -1,3 +1,4 @@
 ---
 - import_tasks: hardware-specific-fixes.yml
   tags: hardware-specific-fixes
+  become: yes
