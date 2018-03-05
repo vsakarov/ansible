@@ -16,3 +16,10 @@
     cron: name='Increase LCD PWM rate' job='intel_reg read 0xC8254 | grep 12280000 && intel_reg write 0xC8254 0x3d103d1'
     tags: configuration
   when: ansible_product_name == '4291IR6' and ansible_product_version == 'ThinkPad X220'
+
+# https://www.yubico.com/support/knowledge-base/categories/articles/can-set-linux-system-use-u2f/
+- name: Setup system for u2f (needed for Feitian ePass)
+  get_url:
+    url: https://raw.githubusercontent.com/Yubico/libu2f-host/master/70-u2f.rules
+    dest: /etc/udev/rules.d/70-u2f.rules
+    mode: 0644
