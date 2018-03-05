@@ -1,0 +1,42 @@
+---
+- name: Install tmux
+  apt:
+    name: tmux
+  tags: packages
+
+- set_fact:
+    tmux_plugin_path: "{{ first_user.home }}/.config/tmux-plugins"
+    tmux_plugin_path_relative: "~/.config/tmux-plugins"
+
+- name: Create tmux plugin directory
+  file:
+    state: directory
+    path: "{{ tmux_plugin_path }}"
+    owner: "{{ first_user.name }}"
+    group: "{{ first_user.name }}"
+  tags: configuration
+
+- name: Clone tmux plugins
+  git:
+    repo: "{{ item }}"
+    dest: "{{ tmux_plugin_path }}/{{ item | basename }}"
+    update: no
+  become: yes
+  become_user: "{{ first_user.name }}"
+  tags: configuration
+  with_items:
+    - https://github.com/tmux-plugins/tpm
+
+# # Following should be set at the bottom of .tmux.conf
+# set-environment -g TMUX_PLUGIN_MANAGER_PATH '{{ tmux_plugin_path_relative }}/'
+# run '{{ tmux_plugin_path_relative }}/tpm/tpm'
+
+- name: Download .tmux.conf
+  get_url:
+    url: "{{ dot_tmux_conf_url }}"
+    dest: "{{ first_user.home }}/.tmux.conf"
+    owner: "{{ first_user.name }}"
+    group: "{{ first_user.name }}"
+    force: no
+  tags:
+    - configuration

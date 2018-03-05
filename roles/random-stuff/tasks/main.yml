@@ -2,3 +2,6 @@
 - import_tasks: hardware-specific-fixes.yml
   tags: hardware-specific-fixes
   become: yes
+
+- import_tasks: tmux.yml
+  tags: tmux
