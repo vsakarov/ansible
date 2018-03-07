@@ -8,3 +8,7 @@
 
 - import_tasks: tmux.yml
   tags: tmux
+
+- import_tasks: unattended-upgrades.yml
+  tags: unattended-upgrades
+  become: yes
