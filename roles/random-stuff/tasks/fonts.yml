@@ -1,0 +1,23 @@
+- name: Create fonts directory
+  file:
+    state: directory
+    path: "{{ first_user.home }}/{{ item }}"
+    owner: "{{ first_user.name }}"
+    group: "{{ first_user.name }}"
+  with_items:
+    - .local
+    - .local/share
+    - .local/share/fonts
+  tags: configuration
+
+- name: Download source code pro
+  git:
+    repo: https://github.com/adobe-fonts/source-code-pro
+    version: release
+    depth: 1
+    dest: "{{ first_user.home }}/.local/share/fonts/source-code-pro"
+    update: no
+  become: yes
+  become_user: "{{ first_user.name }}"
+  notify: Recreate fontconfig cache
+  tags: configuration
