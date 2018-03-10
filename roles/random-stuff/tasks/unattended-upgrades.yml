@@ -6,7 +6,16 @@
     name: unattended-upgrades
   tags: packages
 
-# /etc/apt/apt.conf.d/50unattended-upgrades
+- name: Enable unattended upgrades repos
+  replace:
+    path: /etc/apt/apt.conf.d/50unattended-upgrades
+    regexp: '.*{{ item | regex_escape() }}'
+    replace: "	{{ item }}"
+  with_items:
+    - '"${distro_id}:${distro_codename}-updates";'
+    - '"${distro_id}:${distro_codename}-proposed";'
+    - '"${distro_id}:${distro_codename}-backports";'
+  tags: configuration
 
 - name: Adjust APT update intervals
   lineinfile:
