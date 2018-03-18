@@ -11,6 +11,7 @@ sudo apt install ansible git
 # dconf module is part ansible version 2.4, so ppa repo may be needed
 sudo ansible-pull -U https://github.com/vsakarov/ansible/ install-ansible-from-ppa.yml
 sudo ansible-pull -U https://github.com/vsakarov/ansible/ break-stuff.yml --tags XXXXX --check
+sudo ansible-pull -U https://github.com/vsakarov/ansible/ single.yml -e task=XXXXX --check
 ```
 
 ### Local clone
@@ -21,4 +22,5 @@ cd ansible
 sudo ansible-playbook install-ansible-from-ppa.yml
 sudo ansible-playbook break-stuff.yml --list-tags
 sudo ansible-playbook break-stuff.yml --diff --tags XXXXX --check
+sudo ansible-playbook single.yml --diff -e task=XXXXX --check
 ```

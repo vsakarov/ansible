@@ -5,7 +5,6 @@
   connection: local
   gather_facts: no
   roles:
-    - { role: docker-install, tags: ['docker-install', 'docker'] }
     - { role: editors, tags: editors }
     - { role: git, tags: git }
     - { role: random-stuff, tags: random-stuff }

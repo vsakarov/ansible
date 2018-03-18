@@ -2,6 +2,6 @@
 - setup:
   when: ansible_distribution is not defined
 
-- import_tasks: ubuntu.yml
+- import_tasks: docker-ubuntu.yml
   become: yes
   when: ansible_distribution == 'Ubuntu'
