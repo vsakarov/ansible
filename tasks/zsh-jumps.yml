@@ -1,0 +1,27 @@
+# ansible-playbook single.yml --diff -e task=zsh-jumps -e work_dir=~/w/
+---
+- name: Find directories in {{ work_dir }}
+  find:
+    paths: "{{ work_dir }}"
+    file_type: directory
+  register: work_dir_list
+  when: work_dir is defined
+
+- name: Create marks directory
+  file:
+    path: "{{ first_user.home }}/.marks"
+    state: directory
+    owner: "{{ first_user.name }}"
+    group: "{{ first_user.name }}"
+    mode: 0755
+  when: work_dir is defined
+
+- name: Create zsh jumps
+  file:
+    src: "{{ item }}"
+    dest: "{{ first_user.home }}/.marks/{{ item | basename }}"
+    owner: "{{ first_user.name }}"
+    group: "{{ first_user.name }}"
+    state: link
+  with_items: "{{ work_dir_list.files | map(attribute='path') | list }}"
+  when: work_dir is defined
