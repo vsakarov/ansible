@@ -1,0 +1,37 @@
+---
+- set_fact:
+    zsh_custom_directory: "{{ first_user.home }}/.zsh_custom"
+
+- name: Clone rbenv
+  git:
+    repo: https://github.com/rbenv/rbenv.git
+    dest: "{{ first_user.home }}/.rbenv"
+  become: yes
+  become_user: "{{ first_user.name }}"
+
+- name: Clone rbenv plugins
+  git:
+    repo: "{{ item }}"
+    dest: "{{ first_user.home }}/.rbenv/plugins/{{ item | basename }}"
+  become: yes
+  become_user: "{{ first_user.name }}"
+  with_items:
+    - https://github.com/rbenv/rbenv-vars
+    - https://github.com/rbenv/ruby-build
+
+- name: Zsh completion
+  file:
+    state: link
+    src: ~/.rbenv/completions/rbenv.zsh
+    dest: "{{ zsh_custom_directory }}/rbenv-completion.zsh"
+    owner: "{{ first_user.name }}"
+    group: "{{ first_user.name }}"
+
+- copy:
+    content: |
+      export PATH="$HOME/.rbenv/bin:$PATH"
+      if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+    dest: "{{ zsh_custom_directory }}/rbenv.zsh"
+    owner: "{{ first_user.name }}"
+    group: "{{ first_user.name }}"
+    mode: 0644
