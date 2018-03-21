@@ -1,0 +1,58 @@
+- name: Install zsh
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - command-not-found
+    - zsh
+  tags: packages
+
+- name: Clone oh-my-zsh
+  git:
+    repo: https://github.com/robbyrussell/oh-my-zsh/
+    dest: "{{ first_user.home }}/.oh-my-zsh"
+    update: no
+  become: yes
+  become_user: "{{ first_user.name }}"
+  tags:
+    - configuration
+    - oh-my-zsh
+
+- name: Download .zshrc
+  get_url:
+    url: "{{ dot_zshrc_url }}"
+    dest: "{{ first_user.home }}/.zshrc"
+    owner: "{{ first_user.name }}"
+    group: "{{ first_user.name }}"
+    force: no
+  tags:
+    - configuration
+    - oh-my-zsh
+
+- name: Create zsh directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ first_user.name }}"
+    group: "{{ first_user.name }}"
+    mode: 0755
+  with_items:
+    - "{{ first_user.home }}/.marks"
+    - "{{ first_user.home }}/.zsh_custom"
+
+- name: Add some aliases
+  lineinfile:
+    path: "{{ zsh_custom_directory }}/alias.zsh"
+    regexp: ".*{{ item.alias }}="
+    line: "alias {{ item.alias }}=\"{{ item.value }}\""
+    owner: "{{ first_user.name }}"
+    group: "{{ first_user.name }}"
+    create: yes
+  with_items:
+    - { alias: 'e', value: 'editor' }
+    - { alias: 'j', value: 'jump' }
+    - { alias: 'o', value: 'xdg-open' }
+
+- name: Set {{ first_user.name }} shell to zsh
+  user:
+    name: "{{ first_user.name }}"
+    shell: /bin/zsh

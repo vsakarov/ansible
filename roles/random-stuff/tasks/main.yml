@@ -12,3 +12,6 @@
 - import_tasks: unattended-upgrades.yml
   tags: unattended-upgrades
   become: yes
+
+- import_tasks: zsh.yml
+  tags: zsh
