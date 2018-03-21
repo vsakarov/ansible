@@ -1,2 +1,7 @@
 [local]
 localhost ansible_connection=local
+
+[python3]
+
+[python3:vars]
+ansible_python_interpreter=/usr/bin/python3
