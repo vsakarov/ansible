@@ -1,0 +1,116 @@
+---
+- set_fact:
+    gnome_extensions_enabled:
+      - pixel-saver@deadalnix.me
+      - dash-to-panel@jderose9.github.com
+    gnome_favorite_apps:
+      - 'firefox.desktop'
+      - 'org.gnome.Terminal.desktop'
+      - 'emacs25.desktop'
+      - 'org.gnome.Nautilus.desktop'
+    gnome_theme: Ambiance
+
+- name: Check whether gnome shell is installed
+  stat:
+    path: /usr/bin/gnome-shell
+  register: gnome_stat
+
+- name: Install gnome extensions and tools
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - dconf-editor
+    - gnome-shell-extension-dash-to-panel
+    - gnome-shell-extension-pixelsaver
+    - gnome-tweak-tool
+    - network-manager-openvpn-gnome
+    - python-psutil
+    # - python3-psutil
+  become: yes
+  when: gnome_stat.stat.exists
+
+- name: Remove ubuntu dock as it breaks dash-to-panel shortcuts
+  apt:
+    name: gnome-shell-extension-ubuntu-dock
+    state: absent
+  become: yes
+  when: gnome_stat.stat.exists
+
+- block:
+    - name: Use caps as control
+      dconf:
+        key: "/org/gnome/desktop/input-sources/xkb-options"
+        value: "['ctrl:nocaps']"
+
+    - name: Set Bulgarian bds keyboard layout
+      dconf:
+        key: "/org/gnome/desktop/input-sources/sources"
+        value: "[('xkb', 'us'), ('xkb', 'bg')]"
+
+    - name: Read gnome extensions
+      dconf:
+        key: "/org/gnome/shell/enabled-extensions"
+        state: read
+      register: dconf_enabled_extensions
+
+    - set_fact:
+        gnome_extensions_current: "{{ dconf_enabled_extensions.value | from_yaml if dconf_enabled_extensions.value != None else [] }}"
+
+    - name: Enable extensions
+      dconf:
+        key: "/org/gnome/shell/enabled-extensions"
+        value: "{{ (gnome_extensions_enabled + gnome_extensions_current) | unique }}"
+
+    - name: Read favorite apps
+      dconf:
+        key: "/org/gnome/shell/favorite-apps"
+        state: read
+      register: dconf_favorite_apps
+
+    - set_fact:
+        favorite_apps: "{{ dconf_favorite_apps.value | from_yaml if dconf_favorite_apps.value != None else [] }}"
+
+    - name: Set some favorite apps to be easily accessible with Super-#
+      dconf:
+        key: "/org/gnome/shell/favorite-apps"
+        value: "{{ (gnome_favorite_apps + favorite_apps) | unique }}"
+
+    - name: Disable media automount
+      dconf:
+        key: "/org/gnome/desktop/media-handling/automount"
+        value: "false"
+
+    - name: Activate gnome's night light mode
+      dconf:
+        key: "/org/gnome/settings-daemon/plugins/color/night-light-enabled"
+        value: "true"
+
+    # Changes lots of application themes and break meld
+    - name: Set gnome theme
+      dconf:
+        key: "/org/gnome/desktop/interface/gtk-theme"
+        value: "'{{ gnome_theme }}'"
+
+    - name: Dash to panel settings
+      dconf:
+        key: "/org/gnome/shell/extensions/dash-to-panel/{{ item | regex_replace('=.*') }}"
+        value: "{{ item | regex_replace('.*=') }}"
+      with_items:
+        - animate-show-apps=false
+        - appicon-margin=0
+        - dot-position='TOP'
+        - dot-style-focused='DOTS'
+        - dot-style-unfocused='DOTS'
+        - focus-highlight=true
+        - hot-keys=true
+        - location-clock='STATUSRIGHT'
+        - panel-position='TOP'
+        - panel-size=24
+        - show-activities-button=false
+        - show-appmenu=true
+        - show-favorites=true
+        - show-show-apps-button=true
+        - show-showdesktop-button=false
+  become: yes
+  become_user: "{{ first_user.name }}"
+  when: gnome_stat.stat.exists
