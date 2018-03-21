@@ -6,6 +6,10 @@
   tags: hardware-specific-fixes
   become: yes
 
+- import_tasks: packages.yml
+  tags: packages
+  become: yes
+
 - import_tasks: tmux.yml
   tags: tmux
 
