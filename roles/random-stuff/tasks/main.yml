@@ -1,4 +1,7 @@
 ---
+- import_tasks: firefox.yml
+  tags: firefox
+
 - import_tasks: fonts.yml
   tags: fonts
 

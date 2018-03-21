@@ -1,0 +1,31 @@
+- name: Find Firefox profile path
+  find:
+    paths: "{{ first_user.home }}/.mozilla/firefox/"
+    patterns: "*default"
+    file_type: directory
+  register: firefox_find
+
+- name: Firefox user config
+  lineinfile:
+    dest: "{{ firefox_find.files[0].path }}/user.js"
+    line: "{{ item }}"
+    owner: "{{ first_user.name }}"
+    group: "{{ first_user.name }}"
+    create: yes
+  with_items:
+    - '# Mozilla User Preferences'
+    # Show your windows and tabs from last time
+    - 'user_pref("browser.startup.page", 3);'
+    # Enable u2f support
+    - 'user_pref("security.webauth.u2f", true);'
+    # Disable web site notifications
+    - 'user_pref("dom.webnotifications.enabled", false);'
+    # Disable remembering of logins and passwords for websites
+    - 'user_pref("signon.rememberSignons", false);'
+    # Disable full screen animation
+    - 'user_pref("toolkit.cosmeticAnimations.enabled", false);'
+    # Set do not track header
+    - 'user_pref("privacy.donottrackheader.enabled", true);'
+    - 'user_pref("privacy.trackingprotection.enabled", true);'
+
+  when: firefox_find.matched != 0
