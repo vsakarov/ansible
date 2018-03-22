@@ -42,7 +42,7 @@
 - name: Add some aliases
   lineinfile:
     path: "{{ zsh_custom_directory }}/alias.zsh"
-    regexp: ".*{{ item.alias }}="
+    regexp: "^[#\\s]*alias\\s+{{ item.alias | regex_escape() }}="
     line: "alias {{ item.alias }}=\"{{ item.value }}\""
     owner: "{{ first_user.name }}"
     group: "{{ first_user.name }}"
