@@ -14,15 +14,15 @@
     owner: "{{ first_user.name }}"
     group: "{{ first_user.name }}"
   with_items:
-    - { s: alias, o: st, v: status }
-    - { s: alias, o: ci, v: commit }
     - { s: alias, o: br, v: branch }
+    - { s: alias, o: ci, v: commit }
     - { s: alias, o: ci, v: commit }
     - { s: alias, o: co, v: checkout }
     - { s: alias, o: cp, v: cherry-pick }
     - { s: alias, o: di, v: diff }
     - { s: alias, o: dw, v: diff --word-diff }
-    - { s: alias, o: remove-merged, v: "!git branch --merged | grep -v master | grep -v '^\\\\*' | xargs git br -d" }
+    - { s: alias, o: remove-merged, v: "!git branch --merged | grep -v 'master\\\\|^\\\\*' | xargs --no-run-if-empty git br -d" }
+    - { s: alias, o: st, v: status }
     - { s: alias, o: st, v: status }
     - { s: color, o: ui, v: true }
     - { s: push,  o: default, v: simple }
