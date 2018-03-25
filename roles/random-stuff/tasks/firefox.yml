@@ -27,5 +27,9 @@
     # Set do not track header
     - 'user_pref("privacy.donottrackheader.enabled", true);'
     - 'user_pref("privacy.trackingprotection.enabled", true);'
+    # Cleanup new tab
+    - 'user_pref("browser.newtabpage.activity-stream.feeds.section.highlights", false);'
+    - 'user_pref("browser.newtabpage.activity-stream.prerender", false);'
+    - 'user_pref("browser.newtabpage.activity-stream.showTopSites", false);'
 
   when: firefox_find.matched != 0
