@@ -13,6 +13,9 @@
   tags: packages
   become: yes
 
+- import_tasks: ssh.yml
+  tags: ssh
+
 - import_tasks: tmux.yml
   tags: tmux
 

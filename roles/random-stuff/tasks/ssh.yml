@@ -1,0 +1,60 @@
+- name: Install ssh packages
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - opensc
+    - openssh-client
+  tags: packages
+
+- name: Set ssh directory permissions
+  file:
+    state: directory
+    path: "{{ first_user.home }}/.ssh/"
+    owner: "{{ first_user.name }}"
+    group: "{{ first_user.name }}"
+    mode: 0700
+  with_items:
+    - "{{ first_user.home }}/.ssh/"
+    - "{{ first_user.home }}/.ssh/sockets/"
+
+- name: Configure user's ssh
+  lineinfile:
+    dest: "{{ first_user.home }}/.ssh/config"
+    regexp: ".*{{ item.key }}"
+    line: "{{ item.key }} {{ item.value }}"
+    owner: "{{ first_user.name }}"
+    group: "{{ first_user.name }}"
+    create: yes
+  with_items:
+    - { key: 'ForwardAgent', value: 'no' }
+    - { key: 'PKCS11Provider', value: '/usr/lib/x86_64-linux-gnu/opensc-pkcs11.so' }
+    - { key: 'ServerAliveInterval', value: '60' }
+  tags: configuration
+
+- name: Check whether authorized_keys file is available
+  stat:
+    path: "{{ first_user.home }}/.ssh/authorized_keys"
+  register: authorized_keys_stat
+  tags:
+    - configuration
+    - sshd
+
+- block:
+  - name: Install openssh-server
+    apt:
+      name: openssh-server
+    tags: packages
+
+  - name: Configure ssh server
+    lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: "^[# ]*{{ item.key }} "
+      line: "{{ item.key }} {{ item.value }}"
+    with_items:
+      - { key: 'PasswordAuthentication', value: 'no' }
+      - { key: 'PermitRootLogin', value: 'no' }
+      - { key: 'Port', value: "{{ ssh_server_port }}" }
+    notify: Restart ssh server
+    tags: configuration
+  when: authorized_keys_stat.stat.exists
+  tags: sshd
