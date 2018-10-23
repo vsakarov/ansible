@@ -4,6 +4,7 @@
   with_items:
     - command-not-found
     - zsh
+  become: yes
   tags: packages
 
 - name: Clone oh-my-zsh
@@ -56,3 +57,4 @@
   user:
     name: "{{ first_user.name }}"
     shell: /bin/zsh
+  become: yes

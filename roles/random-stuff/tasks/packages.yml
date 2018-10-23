@@ -37,4 +37,5 @@
   with_items:
     - { name: 'spotify' }
     - { name: 'skype', options: '--classic' }
+  become: yes
   tags: snap

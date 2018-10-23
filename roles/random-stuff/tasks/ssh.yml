@@ -4,6 +4,7 @@
   with_items:
     - opensc
     - openssh-client
+  become: yes
   tags: packages
 
 - name: Set ssh directory permissions
@@ -56,5 +57,6 @@
       - { key: 'Port', value: "{{ ssh_server_port }}" }
     notify: Restart ssh server
     tags: configuration
+  become: yes
   when: authorized_keys_stat.stat.exists
   tags: sshd
