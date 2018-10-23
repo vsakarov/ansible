@@ -4,10 +4,10 @@
     name: "{{ item }}"
   with_items:
     - emacs
+    - fonts-noto-hinted
     - neovim
     - silversearcher-ag
-    # sqlite3 is needed by emacs' helm-dash
-    - sqlite3
+    - sqlite3 # sqlite3 is needed by emacs' helm-dash
     - vim
     - vim-fugitive
   become: yes

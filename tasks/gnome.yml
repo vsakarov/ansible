@@ -6,9 +6,9 @@
     gnome_favorite_apps:
       - 'firefox.desktop'
       - 'org.gnome.Terminal.desktop'
-      - 'emacs25.desktop'
+      - 'emacs.desktop'
       - 'org.gnome.Nautilus.desktop'
-    gnome_theme: Ambiance
+    gnome_theme: Yaru-dark
 
 - name: Check whether gnome shell is installed
   stat:
@@ -22,7 +22,7 @@
     - dconf-editor
     - gnome-shell-extension-dash-to-panel
     - gnome-shell-extension-pixelsaver
-    - gnome-tweak-tool
+    - gnome-tweaks
     - network-manager-openvpn-gnome
     - python-psutil
     # - python3-psutil
