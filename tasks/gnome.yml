@@ -8,7 +8,6 @@
       - 'org.gnome.Terminal.desktop'
       - 'emacs.desktop'
       - 'org.gnome.Nautilus.desktop'
-    gnome_theme: Yaru-dark
 
 - name: Check whether gnome shell is installed
   stat:
@@ -84,12 +83,6 @@
       dconf:
         key: "/org/gnome/settings-daemon/plugins/color/night-light-enabled"
         value: "true"
-
-    # Changes lots of application themes and break meld
-    - name: Set gnome theme
-      dconf:
-        key: "/org/gnome/desktop/interface/gtk-theme"
-        value: "'{{ gnome_theme }}'"
 
     - name: Dash to panel settings
       dconf:
