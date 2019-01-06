@@ -1,0 +1,31 @@
+---
+- name: Install snap packages
+  command: "snap install {{ item.name }} {{ item.options | default('') }}"
+  args:
+    chdir: /root
+    creates: "/snap/{{ item.name }}"
+  with_items:
+    - { name: 'vscode', options: '--classic' }
+  become: yes
+  tags: snap
+
+- name: Install vscode extensions
+  command: "/snap/bin/vscode --install-extension {{ item }} --force"
+  args:
+    creates: "{{ first_user.home }}/.vscode/extensions/{{ item }}*"
+  with_items:
+    - ms-python.python
+    - vscodevim.vim
+    - vscoss.vscode-ansible
+  tags: extensions
+
+- name: Configure VSpaceCode
+  command: "curl -s {{ item.url }} -o {{ item.dest }}"
+  args:
+    chdir: "{{ first_user.home }}/.config/Code/User/"
+    creates: "{{ first_user.home }}/.config/Code/User/{{ item.dest }}"
+    warn: false # get_url doesn't support creates
+  with_items:
+    - { url: 'https://raw.githubusercontent.com/VSpaceCode/VSpaceCode/master/keybindings.json', dest: 'keybindings.json' }
+    - { url: 'https://raw.githubusercontent.com/VSpaceCode/VSpaceCode/master/settings.json', dest: 'settings.json' }
+  tags: configuration

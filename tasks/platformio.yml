@@ -1,0 +1,17 @@
+---
+- name: Add {{ first_user.name }} to dialout group
+  user:
+    name: "{{ first_user.name }}"
+    groups: dialout
+    append: yes
+  become: yes
+
+- name: Install vscode platformio-ide extensions
+  command: "/snap/bin/vscode --install-extension {{ item }} --force"
+  args:
+    creates: "{{ first_user.home }}/.vscode/extensions/{{ item }}*"
+  with_items:
+    - ms-vscode.cpptools
+    - platformio.platformio-ide
+  tags: vscode
+
