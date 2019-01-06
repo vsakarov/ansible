@@ -23,10 +23,15 @@
     dest: "{{ first_user.home }}/.ssh/config"
     regexp: ".*{{ item.key }}"
     line: "{{ item.key }} {{ item.value }}"
+    firstmatch: yes
+    insertbefore: "^\\s*$|Host"
     owner: "{{ first_user.name }}"
     group: "{{ first_user.name }}"
     create: yes
   with_items:
+    - { key: 'ControlMaster', value: 'auto' }
+    - { key: 'ControlPath', value: '~/.ssh/sockets/%r@%h-%p' }
+    - { key: 'ControlPersist', value: '600' }
     - { key: 'ForwardAgent', value: 'no' }
     - { key: 'PKCS11Provider', value: '/usr/lib/x86_64-linux-gnu/opensc-pkcs11.so' }
     - { key: 'ServerAliveInterval', value: '60' }
