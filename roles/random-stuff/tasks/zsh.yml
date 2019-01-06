@@ -53,6 +53,54 @@
     - { alias: 'j', value: 'jump' }
     - { alias: 'o', value: 'xdg-open' }
 
+- name: Clone fzf
+  git:
+    repo: https://github.com/junegunn/fzf
+    dest: "{{ first_user.home }}/.fzf"
+    update: no
+  become: yes
+  become_user: "{{ first_user.name }}"
+  tags:
+    - configuration
+    - fzf
+
+# TODO: Don't depend on versioned url
+- name: Download fzf executable
+  unarchive:
+    src: https://github.com/junegunn/fzf-bin/releases/download/0.17.5/fzf-0.17.5-linux_amd64.tgz
+    dest: "{{ first_user.home }}/.fzf/bin/"
+    remote_src: yes
+    creates: "{{ first_user.home }}/.fzf/bin/fzf"
+  tags:
+    - configuration
+    - fzf
+
+- name: Configure fzf loading
+  copy:
+    content: |
+      export FZF_HOME=~/.fzf/
+      # Setup fzf
+      # ---------
+      if [[ ! "$PATH" == *$FZF_HOME/bin* ]]; then
+        export PATH="$PATH:$FZF_HOME/bin"
+      fi
+
+      # Auto-completion
+      # ---------------
+      [[ $- == *i* ]] && source "$FZF_HOME/shell/completion.zsh" 2> /dev/null
+
+      # Key bindings
+      # ------------
+      source "$FZF_HOME/shell/key-bindings.zsh"
+
+    dest: "{{ zsh_custom_directory }}/fzf.zsh"
+    owner: "{{ first_user.name }}"
+    group: "{{ first_user.name }}"
+    mode: 0644
+  tags:
+    - configuration
+    - fzf
+
 - name: Set {{ first_user.name }} shell to zsh
   user:
     name: "{{ first_user.name }}"
