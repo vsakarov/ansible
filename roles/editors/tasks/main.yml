@@ -1,15 +1,14 @@
 ---
 - name: Install editors and dependencies
   apt:
-    name: "{{ item }}"
-  with_items:
-    - emacs
-    - fonts-symbola # required for custom floppy disc icon
-    - neovim
-    - silversearcher-ag
-    - sqlite3 # sqlite3 is needed by emacs' helm-dash
-    - vim
-    - vim-fugitive
+    name:
+      - emacs
+      - fonts-symbola # required for custom floppy disc icon
+      - neovim
+      - silversearcher-ag
+      - sqlite3 # sqlite3 is needed by emacs' helm-dash
+      - vim
+      - vim-fugitive
   become: yes
   tags: packages
 

@@ -1,33 +1,31 @@
 - name: Install console tools
   apt:
-    name: "{{ item }}"
-  with_items:
-    - ansible
-    - aptitude
-    - arp-scan
-    - build-essential
-    - curl
-    - exuberant-ctags
-    - git
-    - htop
-    - mosh
-    - nmap
-    - silversearcher-ag
-    - tmux
-    - tree
-    - vim
-    - wget
+    name:
+      - ansible
+      - aptitude
+      - arp-scan
+      - build-essential
+      - curl
+      - exuberant-ctags
+      - git
+      - htop
+      - mosh
+      - nmap
+      - silversearcher-ag
+      - tmux
+      - tree
+      - vim
+      - wget
 
 - name: Install desktop apps
   apt:
-    name: "{{ item }}"
-  with_items:
-    - chromium-browser
-    - firefox
-    - fslint
-    - meld
-    - unison-gtk
-    - vlc
+    name:
+      - chromium-browser
+      - firefox
+      - fslint
+      - meld
+      - unison-gtk
+      - vlc
 
 - name: Install snap packages
   command: "snap install {{ item.name }} {{ item.options | default('') }}"

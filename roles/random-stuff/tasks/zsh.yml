@@ -1,9 +1,8 @@
 - name: Install zsh
   apt:
-    name: "{{ item }}"
-  with_items:
-    - command-not-found
-    - zsh
+    name:
+      - command-not-found
+      - zsh
   become: yes
   tags: packages
 
