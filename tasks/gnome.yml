@@ -1,8 +1,36 @@
+# sudo true && ansible-playbook single.yml --diff -e task=gnome --skip-tags extensions
 ---
+- name: Check gnome shell version
+  shell: "/usr/bin/gnome-shell --version | grep 3.32"
+  register: gnome_shell_compatible_version
+  changed_when: no
+  check_mode: no
+  ignore_errors: yes
+
 - set_fact:
+    gnome_extensions:
+      - id: dash-to-panel@jderose9.github.com
+        url: https://extensions.gnome.org/extension-data/dash-to-paneljderose9.github.com.v19.shell-extension.zip
+      # https://extensions.gnome.org/extension/1267/no-title-bar/
+      - id: no-title-bar@franglais125.gmail.com
+        url: https://extensions.gnome.org/extension-data/no-title-bar%40franglais125.gmail.com.v9.shell-extension.zip
+      # https://extensions.gnome.org/extension/1732/gtk-title-bar/
+      # Use until no title bar is fixed for gnome 3.32
+      - id: gtktitlebar@velitasali.github.io
+        url: https://extensions.gnome.org/extension-data/gtktitlebarvelitasali.github.io.v2.shell-extension.zip
+  when: gnome_shell_compatible_version is not failed
+
+- set_fact:
+    gnome_extensions: []
+  when: gnome_shell_compatible_version is failed
+
+- set_fact:
+    # TODO: auto generate from gnome_extensions
     gnome_extensions_enabled:
-      - pixel-saver@deadalnix.me
       - dash-to-panel@jderose9.github.com
+      - no-title-bar@franglais125.gmail.com
+      - gtktitlebar@velitasali.github.io
+
     gnome_favorite_apps:
       - 'firefox.desktop'
       - 'org.gnome.Terminal.desktop'
@@ -14,24 +42,14 @@
     path: /usr/bin/gnome-shell
   register: gnome_stat
 
-- name: Install gnome extensions and tools
+- name: Install gnome tools
   apt:
-    name: "{{ item }}"
-  with_items:
-    - dconf-editor
-    - gnome-shell-extension-dash-to-panel
-    - gnome-shell-extension-pixelsaver
-    - gnome-tweaks
-    - network-manager-openvpn-gnome
-    - python-psutil
-    # - python3-psutil
-  become: yes
-  when: gnome_stat.stat.exists
-
-- name: Remove ubuntu dock as it breaks dash-to-panel shortcuts
-  apt:
-    name: gnome-shell-extension-ubuntu-dock
-    state: absent
+    name:
+      - dconf-editor
+      - gnome-tweaks
+      - network-manager-openvpn-gnome
+      - python-psutil
+      # - python3-psutil
   become: yes
   when: gnome_stat.stat.exists
 
@@ -45,20 +63,6 @@
       dconf:
         key: "/org/gnome/desktop/input-sources/sources"
         value: "[('xkb', 'us'), ('xkb', 'bg')]"
-
-    - name: Read gnome extensions
-      dconf:
-        key: "/org/gnome/shell/enabled-extensions"
-        state: read
-      register: dconf_enabled_extensions
-
-    - set_fact:
-        gnome_extensions_current: "{{ dconf_enabled_extensions.value | from_yaml if dconf_enabled_extensions.value != None else [] }}"
-
-    - name: Enable extensions
-      dconf:
-        key: "/org/gnome/shell/enabled-extensions"
-        value: "{{ (gnome_extensions_enabled + gnome_extensions_current) | unique }}"
 
     - name: Read favorite apps
       dconf:
@@ -84,26 +88,74 @@
         key: "/org/gnome/settings-daemon/plugins/color/night-light-enabled"
         value: "true"
 
-    - name: Dash to panel settings
-      dconf:
-        key: "/org/gnome/shell/extensions/dash-to-panel/{{ item | regex_replace('=.*') }}"
-        value: "{{ item | regex_replace('.*=') }}"
-      with_items:
-        - animate-show-apps=false
-        - appicon-margin=0
-        - dot-position='TOP'
-        - dot-style-focused='DOTS'
-        - dot-style-unfocused='DOTS'
-        - focus-highlight=true
-        - hot-keys=true
-        - location-clock='STATUSRIGHT'
-        - panel-position='TOP'
-        - panel-size=24
-        - show-activities-button=false
-        - show-appmenu=true
-        - show-favorites=true
-        - show-show-apps-button=true
-        - show-showdesktop-button=false
+    # Extensions
+    - block:
+      - name: Remove ubuntu dock as it breaks dash-to-panel shortcuts
+        apt:
+          name: gnome-shell-extension-ubuntu-dock
+          state: absent
+        become: yes
+        # TODO: remove only when installing dock-to-panel
+        when: gnome_shell_compatible_version is not failed
+
+      - name: Install x11-utils for no title bar
+        apt:
+          name: x11-utils
+        # TODO: install only when installing no title bar
+        when: gnome_shell_compatible_version is not failed
+
+      - name: Create GNOME extension directories
+        file:
+          path: "{{ first_user.home }}/.local/share/gnome-shell/extensions/{{ item.id }}"
+          state: directory
+        with_items: "{{ gnome_extensions | default([]) }}"
+
+      - name: unarchive GNOME extensions
+        unarchive:
+          src: "{{ item.url }}"
+          dest: "{{ first_user.home }}/.local/share/gnome-shell/extensions/{{ item.id }}"
+          creates: "{{ first_user.home }}/.local/share/gnome-shell/extensions/{{ item.id }}/metadata.json"
+          remote_src: yes
+        with_items: "{{ gnome_extensions | default([]) }}"
+
+      - name: Read gnome extensions
+        dconf:
+          key: "/org/gnome/shell/enabled-extensions"
+          state: read
+        register: dconf_enabled_extensions
+
+      - set_fact:
+          gnome_extensions_current: "{{ dconf_enabled_extensions.value | from_yaml if dconf_enabled_extensions.value != None else [] }}"
+
+      - name: Enable extensions
+        dconf:
+          key: "/org/gnome/shell/enabled-extensions"
+          value: "{{ (gnome_extensions_enabled + gnome_extensions_current) | unique }}"
+
+      - name: Dash to panel settings
+        dconf:
+          key: "/org/gnome/shell/extensions/dash-to-panel/{{ item | regex_replace('=.*') }}"
+          value: "{{ item | regex_replace('.*=') }}"
+        with_items:
+          - animate-show-apps=false
+          - appicon-margin=0
+          - dot-position='TOP'
+          - dot-style-focused='DOTS'
+          - dot-style-unfocused='DOTS'
+          - focus-highlight=true
+          - hot-keys=true
+          - location-clock='STATUSRIGHT'
+          - panel-position='TOP'
+          - panel-size=24
+          - show-activities-button=false
+          - show-appmenu=true
+          - show-favorites=true
+          - show-show-apps-button=true
+          - show-showdesktop-button=false
+
+      tags:
+        - extensions
+
   become: yes
   become_user: "{{ first_user.name }}"
   when: gnome_stat.stat.exists
