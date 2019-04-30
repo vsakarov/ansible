@@ -1,22 +1,21 @@
 - name: Install ssh packages
   apt:
-    name: "{{ item }}"
-  with_items:
-    - opensc
-    - openssh-client
+    name:
+      - opensc
+      - openssh-client
   become: yes
   tags: packages
 
 - name: Set ssh directory permissions
   file:
     state: directory
-    path: "{{ first_user.home }}/.ssh/"
+    path: "{{ first_user.home }}/{{ item }}"
     owner: "{{ first_user.name }}"
     group: "{{ first_user.name }}"
     mode: 0700
   with_items:
-    - "{{ first_user.home }}/.ssh/"
-    - "{{ first_user.home }}/.ssh/sockets/"
+    - ".ssh/"
+    - ".ssh/sockets/"
 
 - name: Configure user's ssh
   lineinfile:

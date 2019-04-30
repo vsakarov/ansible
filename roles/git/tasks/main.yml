@@ -14,8 +14,8 @@
     owner: "{{ first_user.name }}"
     group: "{{ first_user.name }}"
   with_items:
+    - { s: alias, o: amend, v: commit --amend }
     - { s: alias, o: br, v: branch }
-    - { s: alias, o: ci, v: commit }
     - { s: alias, o: ci, v: commit }
     - { s: alias, o: co, v: checkout }
     - { s: alias, o: cp, v: cherry-pick }
