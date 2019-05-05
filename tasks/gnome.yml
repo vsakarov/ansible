@@ -139,6 +139,7 @@
         with_items:
           - animate-show-apps=false
           - appicon-margin=0
+          - click-action='RAISE'
           - dot-position='TOP'
           - dot-style-focused='DOTS'
           - dot-style-unfocused='DOTS'
@@ -148,10 +149,11 @@
           - panel-position='TOP'
           - panel-size=24
           - show-activities-button=false
-          - show-appmenu=true
+          - show-appmenu=false
           - show-favorites=true
           - show-show-apps-button=true
           - show-showdesktop-button=false
+          - show-window-previews=false
 
       tags:
         - extensions
