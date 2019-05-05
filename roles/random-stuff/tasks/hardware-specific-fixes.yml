@@ -17,6 +17,38 @@
     tags: configuration
   when: ansible_product_name == '4291IR6' and ansible_product_version == 'ThinkPad X220'
 
+# Fix right speaker on HUAWEI MateBook X
+# https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1721987/comments/25
+- block:
+  - name: Download huawei-sound.sh
+    get_url:
+      url: https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1721987/+attachment/5234959/+files/huawei-sound.sh
+      dest: /usr/local/bin/huawei-sound.sh
+      checksum: sha256:c8225593ae74fc8048a985d610d42d441fc3a89c592c39f8bfeec3886c7bb4b8
+      mode: 0755
+
+  - copy:
+      content: |
+        [Unit]
+        Description=Huawei-soundfix
+
+        [Service]
+        Type=idle
+        ExecStart=/bin/bash /usr/local/bin/huawei-sound.sh
+
+        [Install]
+        WantedBy=multi-user.target sleep.target
+      dest: /etc/systemd/system/huawei-sound.service
+      mode: 0644
+
+  - name: Enable huawei-sound service script
+    systemd:
+      name: huawei-sound
+      enabled: yes
+      daemon_reload: yes
+  when: ansible_product_name == 'HUAWEI MateBook X' and ansible_product_version == '2.0'
+  become: yes
+
 # https://www.yubico.com/support/knowledge-base/categories/articles/can-set-linux-system-use-u2f/
 - name: Setup system for u2f (needed for Feitian ePass)
   get_url:
