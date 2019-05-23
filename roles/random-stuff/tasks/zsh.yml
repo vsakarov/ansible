@@ -100,6 +100,17 @@
     - configuration
     - fzf
 
+- name: Clone zsh-autosuggestions
+  git:
+    repo: https://github.com/zsh-users/zsh-autosuggestions
+    dest: "{{ first_user.home }}/.zsh_custom/plugins/zsh-autosuggestions"
+    update: no
+  become: yes
+  become_user: "{{ first_user.name }}"
+  tags:
+    - configuration
+    - oh-my-zsh
+
 - name: Set {{ first_user.name }} shell to zsh
   user:
     name: "{{ first_user.name }}"
