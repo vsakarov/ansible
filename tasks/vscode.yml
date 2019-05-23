@@ -5,12 +5,12 @@
     chdir: /root
     creates: "/snap/{{ item.name }}"
   with_items:
-    - { name: 'vscode', options: '--classic' }
+    - { name: 'code', options: '--classic' }
   become: yes
   tags: snap
 
-- name: Install vscode extensions
-  command: "/snap/bin/vscode --install-extension {{ item }} --force"
+- name: Install Visual Studio Code extensions
+  command: "/snap/bin/code --install-extension {{ item }} --force"
   args:
     creates: "{{ first_user.home }}/.vscode/extensions/{{ item }}*"
   with_items:

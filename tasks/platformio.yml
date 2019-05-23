@@ -6,8 +6,8 @@
     append: yes
   become: yes
 
-- name: Install vscode platformio-ide extensions
-  command: "/snap/bin/vscode --install-extension {{ item }} --force"
+- name: Install Visual Studio Code platformio-ide extensions
+  command: "/snap/bin/code --install-extension {{ item }} --force"
   args:
     creates: "{{ first_user.home }}/.vscode/extensions/{{ item }}*"
   with_items:
