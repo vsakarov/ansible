@@ -8,6 +8,7 @@
 - name: Firefox user config
   lineinfile:
     dest: "{{ firefox_find.files[0].path }}/user.js"
+    regexp: ".*{{ item | regex_escape() | regex_replace(',.*') }}"
     line: "{{ item }}"
     owner: "{{ first_user.name }}"
     group: "{{ first_user.name }}"
@@ -16,6 +17,8 @@
     - '# Mozilla User Preferences'
     # Show your windows and tabs from last time
     - 'user_pref("browser.startup.page", 3);'
+    # Client side title bar
+    - 'user_pref("browser.tabs.drawInTitlebar", true);'
     # Enable u2f support
     - 'user_pref("security.webauth.u2f", true);'
     # Disable web site notifications
