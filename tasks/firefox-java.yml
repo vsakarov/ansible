@@ -1,0 +1,91 @@
+# Latest firefox with java support
+# TODO: secure with apparmor/firejail/snap
+---
+- setup:
+  when: ansible_user_dir is not defined
+
+- name: Download firefox 52.0esr
+  get_url:
+    url: https://ftp.mozilla.org/pub/firefox/releases/52.0esr/firefox-52.0esr.linux-x86_64.sdk.tar.bz2
+    dest: "{{ ansible_user_dir }}/i/firefox-52.0esr.linux-x86_64.sdk.tar.bz2"
+    checksum: 'sha256:acf9404a1098390ca09bd1ea4b7572611afb2584424d82df982b40646decede6'
+
+- name: Create directory for firefox
+  file:
+    state: directory
+    path: "{{ ansible_user_dir }}/i/firefox-52.0esr/"
+
+- name: Extract firefox to {{ ansible_user_dir }}/i/firefox-52.0esr/
+  unarchive:
+    src: "{{ ansible_user_dir }}/i/firefox-52.0esr.linux-x86_64.sdk.tar.bz2"
+    dest: "{{ ansible_user_dir }}/i/firefox-52.0esr/"
+    remote_src: yes
+    creates: "{{ ansible_user_dir }}/i/firefox-52.0esr/firefox-sdk"
+
+- name: Find Firefox profile path
+  find:
+    paths: "{{ ansible_user_dir }}/.mozilla/firefox/"
+    patterns: "*java"
+    file_type: directory
+  register: firefox_find
+
+- name: Create firefox java profile
+  # command: "{{ ansible_user_dir }}/i/firefox-52.0esr/firefox-sdk/bin/firefox -CreateProfile 'java {{ ansible_user_dir }}/i/firefox-52.0esr/firefox-sdk/' --no-remote"
+  command: "{{ ansible_user_dir }}/i/firefox-52.0esr/firefox-sdk/bin/firefox -CreateProfile java --no-remote"
+  args:
+    creates: "{{ ansible_user_dir }}/.mozilla/firefox/*java"
+  when: firefox_find.matched == 0
+  register: firefox_out
+
+- debug:
+    var: firefox_out
+
+- name: Find Firefox profile path
+  find:
+    paths: "{{ ansible_user_dir }}/.mozilla/firefox/"
+    patterns: "*java"
+    file_type: directory
+  register: firefox_find
+
+- name: Firefox user config
+  lineinfile:
+    dest: "{{ firefox_find.files[0].path }}/user.js"
+    regexp: ".*{{ item | regex_escape() | regex_replace(',.*') }}"
+    line: "{{ item }}"
+    create: yes
+  with_items:
+    - '# Mozilla User Preferences'
+    - 'user_pref("app.update.enabled", false);'
+    - 'user_pref("app.update.auto", false);'
+  when: firefox_find.matched != 0
+
+- name: Create desktop file
+  copy:
+    dest: "{{ ansible_user_dir }}/.local/share/applications/firefox-java.desktop"
+    content: |
+      [Desktop Entry]
+      Version=1.0
+      Name=Firefox 52 ESR With Java
+      Comment=Browse the World Wide Web
+      GenericName=Web Browser with Java
+      Exec={{ ansible_user_dir }}/i/firefox-52.0esr/firefox-sdk/bin/firefox --class=firefox-java -no-remote -P java %u
+      Terminal=false
+      X-MultipleArgs=false
+      Type=Application
+      Icon=www-browser
+
+- name: Install nvidia jre with libnpjp2.so
+  package:
+    name: nvidia-openjdk-8-jre
+  become: yes
+
+- name: Create mozilla plugins dir
+  file:
+    state: directory
+    path: "{{ ansible_user_dir }}/.mozilla/plugins/"
+
+- name: Symlink libnpjp2 in firefox
+  file:
+    state: link
+    src: /usr/lib/jvm/nvidia-java-8-openjdk-amd64/lib/amd64/libnpjp2.so
+    dest: "{{ ansible_user_dir }}/.mozilla/plugins/libnpjp2.so"
