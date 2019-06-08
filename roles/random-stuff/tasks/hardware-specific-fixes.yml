@@ -12,10 +12,34 @@
       name: intel-gpu-tools
     tags: packages
 
-  - name: Add cron job to set thinkpad x220 pwm setting every minute
-    cron: name='Increase LCD PWM rate' job='intel_reg read 0xC8254 | grep 12280000 && intel_reg write 0xC8254 0x3d103d1'
-    tags: configuration
+  - copy:
+      content: |
+        #!/bin/bash
+        intel_reg read 0xC8254 | grep 12280000 && intel_reg write 0xC8254 0x3d103d1
+      dest: /usr/local/bin/thinkpad-lcd-pwm-fix.sh
+      mode: 0755
+
+  - copy:
+      content: |
+        [Unit]
+        Description=Increase LCD PWM rate
+
+        [Service]
+        Type=idle
+        ExecStart=/bin/bash /usr/local/bin/thinkpad-lcd-pwm-fix.sh
+
+        [Install]
+        WantedBy=multi-user.target sleep.target
+      dest: /etc/systemd/system/thinkpad-lcd-pwm-fix.service
+      mode: 0644
+
+  - name: Enable thinkpad-lcd-pwm-fix service script
+    systemd:
+      name: thinkpad-lcd-pwm-fix
+      enabled: yes
+      daemon_reload: yes
   when: ansible_product_name == '4291IR6' and ansible_product_version == 'ThinkPad X220'
+  tags: x220
 
 # Fix right speaker on HUAWEI MateBook X
 # https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1721987/comments/25
