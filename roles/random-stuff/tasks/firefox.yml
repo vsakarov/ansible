@@ -1,3 +1,11 @@
+- name: Enable AppArmor for Firefox
+  file:
+    state: absent
+    path: /etc/apparmor.d/disable/usr.bin.firefox
+  tags:
+    - apparmor
+  become: yes
+
 - name: Find Firefox profile path
   find:
     paths: "{{ first_user.home }}/.mozilla/firefox/"
