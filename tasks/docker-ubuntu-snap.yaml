@@ -1,0 +1,10 @@
+---
+- name: Install docker snap package
+  command: "snap install {{ item.name }} {{ item.options | default('') }}"
+  args:
+    creates: "/snap/{{ item.name }}"
+  with_items:
+    - { name: 'docker' }
+  become: yes
+
+- import_tasks: docker-add-user-to-group.yaml

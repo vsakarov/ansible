@@ -1,0 +1,15 @@
+---
+- setup:
+  when: ansible_user_dir is not defined
+
+- name: Create docker group
+  group:
+    name: docker
+  become: yes
+
+- name: Add {{ ansible_user_id }} to docker group
+  user:
+    name: "{{ ansible_user_id }}"
+    groups: docker
+    append: yes
+  become: yes

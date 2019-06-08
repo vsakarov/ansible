@@ -2,6 +2,12 @@
 - setup:
   when: ansible_distribution is not defined
 
-- import_tasks: docker-ubuntu.yaml
-  become: yes
-  when: ansible_distribution == 'Ubuntu'
+- import_tasks: docker-ubuntu-ppa.yaml
+  when:
+    - ansible_distribution == 'Ubuntu'
+    - ansible_distribution_version == '18.04'
+
+- import_tasks: docker-ubuntu-snap.yaml
+  when:
+    - ansible_distribution == 'Ubuntu'
+    - ansible_distribution_major_version|int >= 19

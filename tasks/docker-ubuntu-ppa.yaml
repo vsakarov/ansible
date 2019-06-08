@@ -1,0 +1,41 @@
+# Instructions follows official ubuntu installation guide
+# https://docs.docker.com/install/linux/docker-ce/ubuntu/
+# https://docs.docker.com/install/linux/linux-postinstall/
+# https://docs.docker.com/compose/install/
+---
+- block:
+    - name: Remove old docker packages
+      apt:
+        state: absent
+        name:
+          - docker
+          - docker-engine
+          - docker.io
+
+    - name: Add docker's gpg key
+      apt_key:
+        id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+        url: https://download.docker.com/linux/ubuntu/gpg
+
+    - setup:
+      when: ansible_lsb is not defined
+
+    - name: Add docker repo
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable
+        filename: 'docker-com-ubuntu'
+
+    - name: Install docker-ce
+      apt:
+        name: docker-ce
+
+    - import_tasks: docker-add-user-to-group.yaml
+
+    - name: Install python-pip
+      apt:
+        name: python-pip
+
+    - name: Install docker-compose
+      pip:
+        name: docker-compose
+  become: yes
