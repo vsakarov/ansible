@@ -1,0 +1,27 @@
+---
+- import_tasks: firefox.yaml
+  tags: firefox
+
+- import_tasks: fonts.yaml
+  tags: fonts
+
+- import_tasks: hardware-specific-fixes.yaml
+  tags: hardware-specific-fixes
+  become: yes
+
+- import_tasks: packages.yaml
+  tags: packages
+  become: yes
+
+- import_tasks: ssh.yaml
+  tags: ssh
+
+- import_tasks: tmux.yaml
+  tags: tmux
+
+- import_tasks: unattended-upgrades.yaml
+  tags: unattended-upgrades
+  become: yes
+
+- import_tasks: zsh.yaml
+  tags: zsh

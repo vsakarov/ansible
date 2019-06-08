@@ -1,4 +1,4 @@
-# sudo true && ansible-playbook single.yml --diff -e task=gnome --skip-tags extensions
+# sudo true && ansible-playbook single.yaml --diff -e task=gnome --skip-tags extensions
 ---
 - name: Check gnome shell version
   shell: "/usr/bin/gnome-shell --version | grep 3.32"

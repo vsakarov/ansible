@@ -1,5 +1,5 @@
-# sudo ansible-playbook break-stuff.yml --list-tags
-# sudo ansible-playbook break-stuff.yml --diff --tags XXXXX --check
+# sudo ansible-playbook break-stuff.yaml --list-tags
+# sudo ansible-playbook break-stuff.yaml --diff --tags XXXXX --check
 ---
 - hosts: localhost
   connection: local

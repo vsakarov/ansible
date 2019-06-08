@@ -1,4 +1,4 @@
-# sudo ansible-playbook single.yml -e task=XXXXX
+# sudo ansible-playbook single.yaml -e task=XXXXX
 ---
 - hosts: localhost
   connection: local
@@ -6,5 +6,5 @@
   roles:
     - role: first_user
   tasks:
-    - include_tasks: "tasks/{{ task }}.yml"
+    - include_tasks: "tasks/{{ task }}.yaml"
       tags: always

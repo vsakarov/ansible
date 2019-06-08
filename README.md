@@ -9,9 +9,9 @@ This repo contains playbooks for recreating my Ubuntu based workstation. May con
 ```bash
 sudo apt install ansible git
 # dconf module is part ansible version 2.4, so ppa repo may be needed
-sudo true && ansible-pull -U https://github.com/vsakarov/ansible/ install-ansible-from-ppa.yml
-sudo true && ansible-pull -U https://github.com/vsakarov/ansible/ break-stuff.yml --tags XXXXX --check
-sudo true && ansible-pull -U https://github.com/vsakarov/ansible/ single.yml -e task=XXXXX --check
+sudo true && ansible-pull -U https://github.com/vsakarov/ansible/ install-ansible-from-ppa.yaml
+sudo true && ansible-pull -U https://github.com/vsakarov/ansible/ break-stuff.yaml --tags XXXXX --check
+sudo true && ansible-pull -U https://github.com/vsakarov/ansible/ single.yaml -e task=XXXXX --check
 ```
 
 ### Local clone
@@ -19,8 +19,8 @@ sudo true && ansible-pull -U https://github.com/vsakarov/ansible/ single.yml -e 
 sudo apt install ansible
 git clone https://github.com/vsakarov/ansible.git
 cd ansible
-sudo true && ansible-playbook install-ansible-from-ppa.yml
-sudo true && ansible-playbook break-stuff.yml --list-tags
-sudo true && ansible-playbook break-stuff.yml --diff --tags XXXXX --check
-sudo true && ansible-playbook single.yml --diff -e task=XXXXX --check
+sudo true && ansible-playbook install-ansible-from-ppa.yaml
+sudo true && ansible-playbook break-stuff.yaml --list-tags
+sudo true && ansible-playbook break-stuff.yaml --diff --tags XXXXX --check
+sudo true && ansible-playbook single.yaml --diff -e task=XXXXX --check
 ```
