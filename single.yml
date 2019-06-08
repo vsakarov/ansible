@@ -7,3 +7,4 @@
     - role: first_user
   tasks:
     - include_tasks: "tasks/{{ task }}.yml"
+      tags: always

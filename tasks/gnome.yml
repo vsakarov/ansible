@@ -103,6 +103,7 @@
           name: x11-utils
         # TODO: install only when installing no title bar
         when: gnome_shell_compatible_version is not failed
+        become_user: root
 
       - name: Create GNOME extension directories
         file:
