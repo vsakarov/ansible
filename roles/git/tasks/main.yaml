@@ -1,27 +1,25 @@
 ---
 - name: Install git
-  apt:
+  package:
     name: git
   become: yes
   tags: packages
 
 - name: Setup git config
-  ini_file:
-    dest: "{{ ansible_user_dir }}/.gitconfig"
-    section: "{{ item.s }}"
-    option: "{{ item.o }}"
-    value: "{{ item.v }}"
+  git_config:
+    name: "{{ item.name }}"
+    scope: global
+    value: "{{ item.value }}"
   with_items:
-    - { s: alias, o: amend, v: commit --amend }
-    - { s: alias, o: br, v: branch }
-    - { s: alias, o: ci, v: commit }
-    - { s: alias, o: co, v: checkout }
-    - { s: alias, o: cp, v: cherry-pick }
-    - { s: alias, o: di, v: diff }
-    - { s: alias, o: dw, v: diff --word-diff }
-    - { s: alias, o: remove-merged, v: "!git branch --merged | grep -v 'master\\\\|^\\\\*' | xargs --no-run-if-empty git br -d" }
-    - { s: alias, o: st, v: status }
-    - { s: alias, o: st, v: status }
-    - { s: color, o: ui, v: true }
-    - { s: push,  o: default, v: simple }
+    - { name: alias.amend, value: commit --amend }
+    - { name: alias.br, value: branch }
+    - { name: alias.ci, value: commit }
+    - { name: alias.co, value: checkout }
+    - { name: alias.cp, value: cherry-pick }
+    - { name: alias.di, value: diff }
+    - { name: alias.dw, value: diff --word-diff }
+    - { name: alias.remove-merged, value: "!git branch --merged | grep -v 'master\\|^\\*' | xargs --no-run-if-empty git br -d" }
+    - { name: alias.st, value: status }
+    - { name: color.ui, value: true }
+    - { name: push.default, value: simple }
   tags: configuration
