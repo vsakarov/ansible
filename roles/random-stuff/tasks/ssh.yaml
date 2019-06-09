@@ -9,9 +9,7 @@
 - name: Set ssh directory permissions
   file:
     state: directory
-    path: "{{ first_user.home }}/{{ item }}"
-    owner: "{{ first_user.name }}"
-    group: "{{ first_user.name }}"
+    path: "{{ ansible_user_dir }}/{{ item }}"
     mode: 0700
   with_items:
     - ".ssh/"
@@ -19,13 +17,11 @@
 
 - name: Configure user's ssh
   lineinfile:
-    dest: "{{ first_user.home }}/.ssh/config"
+    dest: "{{ ansible_user_dir }}/.ssh/config"
     regexp: ".*{{ item.key }}"
     line: "{{ item.key }} {{ item.value }}"
     firstmatch: yes
     insertbefore: "^\\s*$|Host"
-    owner: "{{ first_user.name }}"
-    group: "{{ first_user.name }}"
     create: yes
   with_items:
     - { key: 'ControlMaster', value: 'auto' }
@@ -38,7 +34,7 @@
 
 - name: Check whether authorized_keys file is available
   stat:
-    path: "{{ first_user.home }}/.ssh/authorized_keys"
+    path: "{{ ansible_user_dir }}/.ssh/authorized_keys"
   register: authorized_keys_stat
   tags:
     - configuration

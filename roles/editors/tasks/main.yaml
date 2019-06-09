@@ -15,10 +15,8 @@
 - name: Clone spacemacs
   git:
     repo: https://github.com/syl20bnr/spacemacs
-    dest: "{{ first_user.home }}/.emacs.d"
+    dest: "{{ ansible_user_dir }}/.emacs.d"
     update: no
-  become: yes
-  become_user: "{{ first_user.name }}"
   tags:
     - configuration
     - spacemacs
@@ -26,9 +24,7 @@
 - name: Download .spacemacs
   get_url:
     url: "{{ dot_spacemacs_url }}"
-    dest: "{{ first_user.home }}/.spacemacs"
-    owner: "{{ first_user.name }}"
-    group: "{{ first_user.name }}"
+    dest: "{{ ansible_user_dir }}/.spacemacs"
     force: no
   tags:
     - configuration
@@ -37,9 +33,7 @@
 - name: Download .vimrc
   get_url:
     url: "{{ dot_vimrc_url }}"
-    dest: "{{ first_user.home }}/.vimrc"
-    owner: "{{ first_user.name }}"
-    group: "{{ first_user.name }}"
+    dest: "{{ ansible_user_dir }}/.vimrc"
     force: no
   tags:
     - configuration

@@ -8,16 +8,6 @@ Requirements
 
 Ubuntu system
 
-Role Variables
---------------
-
-- first_user.home
-
-Dependencies
-------------
-
-- first_user
-
 Example Playbook
 ----------------
 

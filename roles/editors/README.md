@@ -16,8 +16,6 @@ Role Variables
 Dependencies
 ------------
 
-- first_user
-
 Example Playbook
 ----------------
 

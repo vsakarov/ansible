@@ -3,7 +3,6 @@
 ---
 - hosts: localhost
   connection: local
-  gather_facts: no
   roles:
     - { role: editors, tags: editors }
     - { role: git, tags: git }

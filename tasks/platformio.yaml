@@ -1,7 +1,10 @@
 ---
-- name: Add {{ first_user.name }} to dialout group
+- setup:
+  when: ansible_user_dir is not defined
+
+- name: Add {{ ansible_user_id }} to dialout group
   user:
-    name: "{{ first_user.name }}"
+    name: "{{ ansible_user_id }}"
     groups: dialout
     append: yes
   become: yes
@@ -9,7 +12,7 @@
 - name: Install Visual Studio Code platformio-ide extensions
   command: "/snap/bin/code --install-extension {{ item }} --force"
   args:
-    creates: "{{ first_user.home }}/.vscode/extensions/{{ item }}*"
+    creates: "{{ ansible_user_dir }}/.vscode/extensions/{{ item }}*"
   with_items:
     - ms-vscode.cpptools
     - platformio.platformio-ide

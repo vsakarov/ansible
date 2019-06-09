@@ -1,8 +1,6 @@
 ---
 - name: Recreate fontconfig cache
   command: fc-cache
-  become: yes
-  become_user: "{{ first_user.name }}"
 
 - name: Restart ssh server
   service:

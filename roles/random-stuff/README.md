@@ -10,17 +10,6 @@ Requirements
 
 Ubuntu system
 
-Role Variables
---------------
-
-- first_user.name
-- first_user.home
-
-Dependencies
-------------
-
-- first_user
-
 Example Playbook
 ----------------
 

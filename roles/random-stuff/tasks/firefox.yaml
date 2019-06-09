@@ -8,7 +8,7 @@
 
 - name: Find Firefox profile path
   find:
-    paths: "{{ first_user.home }}/.mozilla/firefox/"
+    paths: "{{ ansible_user_dir }}/.mozilla/firefox/"
     patterns: "*default"
     file_type: directory
   register: firefox_find
@@ -18,8 +18,6 @@
     dest: "{{ firefox_find.files[0].path }}/user.js"
     regexp: ".*{{ item | regex_escape() | regex_replace(',.*') }}"
     line: "{{ item }}"
-    owner: "{{ first_user.name }}"
-    group: "{{ first_user.name }}"
     create: yes
   with_items:
     - '# Mozilla User Preferences'

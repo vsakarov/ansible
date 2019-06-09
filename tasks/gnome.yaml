@@ -103,19 +103,22 @@
           name: x11-utils
         # TODO: install only when installing no title bar
         when: gnome_shell_compatible_version is not failed
-        become_user: root
+        become: yes
+
+      - setup:
+        when: ansible_user_dir is not defined
 
       - name: Create GNOME extension directories
         file:
-          path: "{{ first_user.home }}/.local/share/gnome-shell/extensions/{{ item.id }}"
+          path: "{{ ansible_user_dir }}/.local/share/gnome-shell/extensions/{{ item.id }}"
           state: directory
         with_items: "{{ gnome_extensions | default([]) }}"
 
       - name: unarchive GNOME extensions
         unarchive:
           src: "{{ item.url }}"
-          dest: "{{ first_user.home }}/.local/share/gnome-shell/extensions/{{ item.id }}"
-          creates: "{{ first_user.home }}/.local/share/gnome-shell/extensions/{{ item.id }}/metadata.json"
+          dest: "{{ ansible_user_dir }}/.local/share/gnome-shell/extensions/{{ item.id }}"
+          creates: "{{ ansible_user_dir }}/.local/share/gnome-shell/extensions/{{ item.id }}/metadata.json"
           remote_src: yes
         with_items: "{{ gnome_extensions | default([]) }}"
 
@@ -158,7 +161,4 @@
 
       tags:
         - extensions
-
-  become: yes
-  become_user: "{{ first_user.name }}"
   when: gnome_stat.stat.exists

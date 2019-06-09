@@ -3,8 +3,6 @@
 - hosts: localhost
   connection: local
   gather_facts: no
-  roles:
-    - role: first_user
   tasks:
     - include_tasks: "tasks/{{ task }}.yaml"
       tags: always

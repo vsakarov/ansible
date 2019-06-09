@@ -9,10 +9,8 @@
 - name: Clone oh-my-zsh
   git:
     repo: https://github.com/robbyrussell/oh-my-zsh/
-    dest: "{{ first_user.home }}/.oh-my-zsh"
+    dest: "{{ ansible_user_dir }}/.oh-my-zsh"
     update: no
-  become: yes
-  become_user: "{{ first_user.name }}"
   tags:
     - configuration
     - oh-my-zsh
@@ -20,9 +18,7 @@
 - name: Download .zshrc
   get_url:
     url: "{{ dot_zshrc_url }}"
-    dest: "{{ first_user.home }}/.zshrc"
-    owner: "{{ first_user.name }}"
-    group: "{{ first_user.name }}"
+    dest: "{{ ansible_user_dir }}/.zshrc"
     force: no
   tags:
     - configuration
@@ -32,20 +28,16 @@
   file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ first_user.name }}"
-    group: "{{ first_user.name }}"
     mode: 0755
   with_items:
-    - "{{ first_user.home }}/.marks"
-    - "{{ first_user.home }}/.zsh_custom"
+    - "{{ ansible_user_dir }}/.marks"
+    - "{{ ansible_user_dir }}/.zsh_custom"
 
 - name: Add some aliases
   lineinfile:
     path: "{{ zsh_custom_directory }}/alias.zsh"
     regexp: "^[#\\s]*alias\\s+{{ item.alias | regex_escape() }}="
     line: "alias {{ item.alias }}=\"{{ item.value }}\""
-    owner: "{{ first_user.name }}"
-    group: "{{ first_user.name }}"
     create: yes
   with_items:
     - { alias: 'e', value: 'editor' }
@@ -55,10 +47,8 @@
 - name: Clone fzf
   git:
     repo: https://github.com/junegunn/fzf
-    dest: "{{ first_user.home }}/.fzf"
+    dest: "{{ ansible_user_dir }}/.fzf"
     update: no
-  become: yes
-  become_user: "{{ first_user.name }}"
   tags:
     - configuration
     - fzf
@@ -67,9 +57,9 @@
 - name: Download fzf executable
   unarchive:
     src: https://github.com/junegunn/fzf-bin/releases/download/0.17.5/fzf-0.17.5-linux_amd64.tgz
-    dest: "{{ first_user.home }}/.fzf/bin/"
+    dest: "{{ ansible_user_dir }}/.fzf/bin/"
     remote_src: yes
-    creates: "{{ first_user.home }}/.fzf/bin/fzf"
+    creates: "{{ ansible_user_dir }}/.fzf/bin/fzf"
   tags:
     - configuration
     - fzf
@@ -93,8 +83,6 @@
       source "$FZF_HOME/shell/key-bindings.zsh"
 
     dest: "{{ zsh_custom_directory }}/fzf.zsh"
-    owner: "{{ first_user.name }}"
-    group: "{{ first_user.name }}"
     mode: 0644
   tags:
     - configuration
@@ -103,16 +91,14 @@
 - name: Clone zsh-autosuggestions
   git:
     repo: https://github.com/zsh-users/zsh-autosuggestions
-    dest: "{{ first_user.home }}/.zsh_custom/plugins/zsh-autosuggestions"
+    dest: "{{ ansible_user_dir }}/.zsh_custom/plugins/zsh-autosuggestions"
     update: no
-  become: yes
-  become_user: "{{ first_user.name }}"
   tags:
     - configuration
     - oh-my-zsh
 
-- name: Set {{ first_user.name }} shell to zsh
+- name: Set {{ ansible_user_id }} shell to zsh
   user:
-    name: "{{ first_user.name }}"
+    name: "{{ ansible_user_id }}"
     shell: /bin/zsh
   become: yes

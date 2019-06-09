@@ -7,12 +7,10 @@
 
 - name: Setup git config
   ini_file:
-    dest: "{{ first_user.home }}/.gitconfig"
+    dest: "{{ ansible_user_dir }}/.gitconfig"
     section: "{{ item.s }}"
     option: "{{ item.o }}"
     value: "{{ item.v }}"
-    owner: "{{ first_user.name }}"
-    group: "{{ first_user.name }}"
   with_items:
     - { s: alias, o: amend, v: commit --amend }
     - { s: alias, o: br, v: branch }

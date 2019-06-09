@@ -16,6 +16,3 @@ galaxy_info:
 
   galaxy_tags:
     - git
-
-dependencies:
-  - first_user

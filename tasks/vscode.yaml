@@ -9,10 +9,13 @@
   become: yes
   tags: snap
 
+- setup:
+  when: ansible_user_dir is not defined
+
 - name: Install Visual Studio Code extensions
   command: "/snap/bin/code --install-extension {{ item }} --force"
   args:
-    creates: "{{ first_user.home }}/.vscode/extensions/{{ item }}*"
+    creates: "{{ ansible_user_dir }}/.vscode/extensions/{{ item }}*"
   with_items:
     - ms-python.python
     - vscodevim.vim
@@ -22,8 +25,8 @@
 - name: Configure VSpaceCode
   command: "curl -s {{ item.url }} -o {{ item.dest }}"
   args:
-    chdir: "{{ first_user.home }}/.config/Code/User/"
-    creates: "{{ first_user.home }}/.config/Code/User/{{ item.dest }}"
+    chdir: "{{ ansible_user_dir }}/.config/Code/User/"
+    creates: "{{ ansible_user_dir }}/.config/Code/User/{{ item.dest }}"
     warn: false # get_url doesn't support creates
   with_items:
     - { url: 'https://raw.githubusercontent.com/VSpaceCode/VSpaceCode/master/keybindings.json', dest: 'keybindings.json' }
