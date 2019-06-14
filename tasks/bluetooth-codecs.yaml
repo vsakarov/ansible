@@ -1,0 +1,16 @@
+# Adds Sony LDAC, aptX, aptX HD, AAC codecs (A2DP Audio) support to PulseAudio on Linux
+# https://github.com/EHfive/pulseaudio-modules-bt/
+# https://github.com/EHfive/pulseaudio-modules-bt/wiki/Packages
+---
+- name: Add eh5/pulseaudio-a2dp repo
+  apt_repository:
+    repo: 'ppa:eh5/pulseaudio-a2dp'
+  become: true
+
+- name: Install pulseaudio bluetooth module and dependencies
+  apt:
+    name:
+      - libavcodec58
+      - libldac
+      - pulseaudio-modules-bt
+  become: true
