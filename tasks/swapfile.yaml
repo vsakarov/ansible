@@ -1,0 +1,21 @@
+# sudo true && ansible-playbook single.yml --diff -e task=swapfile -e swap_size=5120
+---
+- set_fact:
+    swap_size: 5120
+  when: swap_size is not defined
+
+- block:
+    - name: Create swapfile (dd)
+      command: dd if=/dev/zero of=/swapfile bs=1M count={{ swap_size }}
+      args:
+        creates: /swapfile
+      register: file_created
+
+    - name: mkswap /swapfile
+      command: /sbin/mkswap /swapfile
+      when: file_created.changed
+
+    - name: swapon /swapfile
+      command: /sbin/swapon /swapfile
+      when: file_created.changed
+  become: yes
