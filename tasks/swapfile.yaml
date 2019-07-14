@@ -1,21 +1,50 @@
 # sudo true && ansible-playbook single.yml --diff -e task=swapfile -e swap_size=5120
 ---
 - set_fact:
+    swapfile_path: /swapfile
     swap_size: 5120
-  when: swap_size is not defined
 
 - block:
     - name: Create swapfile (dd)
-      command: dd if=/dev/zero of=/swapfile bs=1M count={{ swap_size }}
+      command: dd if=/dev/zero of={{ swapfile_path }} bs=1M count={{ swap_size }}
       args:
-        creates: /swapfile
+        creates: "{{ swapfile_path }}"
       register: file_created
 
-    - name: mkswap /swapfile
-      command: /sbin/mkswap /swapfile
+    - name: Restrict {{ swapfile_path }} permissions
+      file:
+        path: "{{ swapfile_path }}"
+        owner: root
+        group: root
+        mode: 0600
+
+    # TODO: file {{ swapfile_path }}
+
+    - name: mkswap {{ swapfile_path }}
+      command: /sbin/mkswap {{ swapfile_path }}
       when: file_created.changed
 
-    - name: swapon /swapfile
-      command: /sbin/swapon /swapfile
-      when: file_created.changed
+    - name: Write swap entry in fstab
+      mount:
+        state: present # mounted will not work as swap can't be mounted with mount
+        name: none
+        src: "{{ swapfile_path }}"
+        fstype: swap
+        opts: sw
+        passno: 0
+        dump: 0
+
+# TASK [Check whether /swapfile is active] *************************************************************************************************************
+# fatal: [localhost]: FAILED! => {"changed": false, "cmd": "swapon -s | grep /swapfile", "delta": "0:00:00.005254", "end": "2019-06-27 11:52:15.296960", "msg": "non-zero return code", "rc": 1, "start": "2019-06-27 11:52:15.291706", "stderr": "", "stderr_lines": [], "stdout": "", "stdout_lines": []}
+# ...ignoring
+    - name: Check whether {{ swapfile_path }} is active
+      shell: "swapon -s | grep {{ swapfile_path }}"
+      register: swapfile_active
+      changed_when: no
+      check_mode: no
+      ignore_errors: yes
+
+    - name: swapon {{ swapfile_path }}
+      command: /sbin/swapon {{ swapfile_path }}
+      when: swapfile_active is failed
   become: yes
