@@ -23,5 +23,8 @@
   tags: unattended-upgrades
   become: yes
 
+- import_tasks: user-config.yaml
+  tags: user-config
+
 - import_tasks: zsh.yaml
   tags: zsh
