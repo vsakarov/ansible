@@ -1,0 +1,12 @@
+# https://docs.ansible.com/ansible/latest/modules/ufw_module.html
+---
+- name: Enable ufw
+  ufw:
+    state: enabled
+
+- name: Allow custom ssh port
+  ufw:
+    rule: allow
+    port: 2200
+    proto: tcp
+    comment: custom ssh port

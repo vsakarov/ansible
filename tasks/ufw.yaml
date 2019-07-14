@@ -1,0 +1,34 @@
+# https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-with-ufw-on-ubuntu-18-04
+# https://docs.ansible.com/ansible/latest/modules/ufw_module.html
+---
+- set_fact:
+    ufw_state: enabled
+    # ufw_state: reset
+
+# # ufw is installed by default
+# - name: Install Uncomplicated firewall
+#   apt:
+#     name: ufw
+#   become: yes
+
+- name: Change ufw state
+  ufw:
+    state: "{{ ufw_state }}"
+  become: yes
+
+- block:
+    - debug:
+
+    # sudo ufw allow 1714:1764/udp
+    # sudo ufw allow 1714:1764/tcp
+    - name: Allow port range for kde connect
+      ufw:
+        rule: allow
+        port: 1714:1764
+        proto: "{{ item }}"
+        comment: kde connect
+      loop:
+        - tcp
+        - udp
+  become: yes
+  when: ufw_state == 'enabled'

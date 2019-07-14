@@ -2,6 +2,12 @@
 - import_tasks: firefox.yaml
   tags: firefox
 
+- import_tasks: firewall.yaml
+  become: yes
+  tags:
+    - firewall
+    - ufw
+
 - import_tasks: fonts.yaml
   tags: fonts
 
