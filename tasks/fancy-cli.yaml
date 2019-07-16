@@ -1,0 +1,27 @@
+---
+- setup:
+  when: ansible_user_dir is not defined
+
+- name: Clone k
+  git:
+    repo: https://github.com/supercrabtree/k
+    dest: "{{ ansible_user_dir }}/.zsh_custom/plugins/k"
+    update: no
+
+- name: Change k function to lk
+  replace:
+    path: "{{ ansible_user_dir }}/.zsh_custom/plugins/k/k.sh"
+    regexp: '^k \(\) \{'
+    replace: 'lk () {'
+
+- name: Load k plugin in zsh
+  lineinfile:
+    path: "{{ ansible_user_dir }}/.zshrc"
+    line: plugins+=(k)
+    insertbefore: source \$ZSH/oh-my-zsh.sh
+
+# https://github.com/sharkdp/fd
+- name: Install fd-find
+  apt:
+    name: fd-find
+  become: yes
