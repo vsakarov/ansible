@@ -15,14 +15,45 @@
     - configuration
     - oh-my-zsh
 
-- name: Download .zshrc
-  get_url:
-    url: "{{ dot_zshrc_url }}"
+- name: Copy .zshrc template from oh my zsh
+  copy:
+    src: "{{ ansible_user_dir }}/.oh-my-zsh/templates/zshrc.zsh-template"
     dest: "{{ ansible_user_dir }}/.zshrc"
+    remote_src: yes
     force: no
   tags:
     - configuration
     - oh-my-zsh
+    - zshrc
+
+- name: Set custom variables in zshrc
+  lineinfile:
+    path: "{{ ansible_user_dir }}/.zshrc"
+    regexp: "^[# ]*{{ item.name }}="
+    line: '{{ item.name }}="{{ item.value }}"'
+    insertbefore: source \$ZSH/oh-my-zsh.sh
+  loop:
+    - { name: "COMPLETION_WAITING_DOTS", value: "true" }
+    - { name: "DISABLE_AUTO_UPDATE", value: "true" }
+    - { name: "DISABLE_UNTRACKED_FILES_DIRTY", value: "true" }
+    - { name: "ZSH_CUSTOM", value: "$HOME/.zsh_custom/" }
+    - { name: "ZSH_THEME", value: "aussiegeek" }
+  tags:
+    - configuration
+    - oh-my-zsh
+    - zshrc
+
+- name: Load oh-my-zsh plugins
+  lineinfile:
+    path: "{{ ansible_user_dir }}/.zshrc"
+    line: plugins+=({{ item }})
+    insertbefore: source \$ZSH/oh-my-zsh.sh
+  loop:
+    - command-not-found
+    - fzf
+    - jump
+    - tmux
+    - zsh-autosuggestions
 
 - name: Create zsh directories
   file:

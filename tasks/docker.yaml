@@ -11,3 +11,19 @@
   when:
     - ansible_distribution == 'Ubuntu'
     - ansible_distribution_major_version|int >= 19
+
+- name: Check whether oh my zsh is avaiable
+  stat:
+    path: "{{ ansible_user_dir }}/.oh-my-zsh/"
+  register: oh_my_zsh_stat
+
+- name: Load docker oh-my-zsh plugins
+  lineinfile:
+    path: "{{ ansible_user_dir }}/.zshrc"
+    line: plugins+=({{ item }})
+    insertbefore: source \$ZSH/oh-my-zsh.sh
+  loop:
+    - docker
+    - docker-compose
+    - kubectl
+  when: oh_my_zsh_stat.stat.exists

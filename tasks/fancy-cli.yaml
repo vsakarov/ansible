@@ -2,6 +2,14 @@
 - setup:
   when: ansible_user_dir is not defined
 
+- name: Create zsh custom directories
+  file:
+    state: directory
+    path: "{{ ansible_user_dir }}/{{ item }}"
+  with_items:
+    - .zsh_custom/
+    - .zsh_custom/plugins/
+
 - name: Clone k
   git:
     repo: https://github.com/supercrabtree/k
@@ -25,3 +33,10 @@
   apt:
     name: fd-find
   become: yes
+
+- name: Add fd alias
+  lineinfile:
+    path: "{{ ansible_user_dir }}/.zsh_custom/alias.zsh"
+    regexp: "alias fd=.*"
+    line: alias fd=fdfind
+    create: yes
