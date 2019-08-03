@@ -10,7 +10,7 @@
 - set_fact:
     gnome_extensions:
       - id: dash-to-panel@jderose9.github.com
-        url: https://extensions.gnome.org/extension-data/dash-to-paneljderose9.github.com.v19.shell-extension.zip
+        url: https://github.com/home-sweet-gnome/dash-to-panel/releases/download/v20/dash-to-panel@jderose9.github.com_v20.zip
       # https://extensions.gnome.org/extension/1267/no-title-bar/
       - id: no-title-bar@franglais125.gmail.com
         url: https://extensions.gnome.org/extension-data/no-title-bar%40franglais125.gmail.com.v9.shell-extension.zip
