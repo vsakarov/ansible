@@ -38,6 +38,8 @@
     - { name: "DISABLE_UNTRACKED_FILES_DIRTY", value: "true" }
     - { name: "ZSH_CUSTOM", value: "$HOME/.zsh_custom/" }
     - { name: "ZSH_THEME", value: "aussiegeek" }
+    - { name: "ZSH_TMUX_AUTOSTART", value: "true" }
+    - { name: "ZSH_TMUX_AUTOQUIT", value: "false" }
   tags:
     - configuration
     - oh-my-zsh

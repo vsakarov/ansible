@@ -1,7 +1,10 @@
 ---
-- name: Install tmux
+- name: Install tmux and plugin dependencies
   apt:
-    name: tmux
+    name:
+      - tmux
+      - xsel
+  become: yes
   tags: packages
 
 - set_fact:
@@ -20,8 +23,11 @@
     dest: "{{ tmux_plugin_path }}/{{ item | basename }}"
     update: no
   tags: configuration
-  with_items:
-    - https://github.com/tmux-plugins/tpm
+  loop:
+    - https://github.com/tmux-plugins/tmux-copycat
+    - https://github.com/tmux-plugins/tmux-logging
+    - https://github.com/tmux-plugins/tmux-open
+    - https://github.com/tmux-plugins/tmux-yank
 
 # # Following should be set at the bottom of .tmux.conf
 # set-environment -g TMUX_PLUGIN_MANAGER_PATH '{{ tmux_plugin_path_relative }}/'
