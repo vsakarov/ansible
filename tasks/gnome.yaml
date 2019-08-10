@@ -18,6 +18,8 @@
       # Use until no title bar is fixed for gnome 3.32
       - id: gtktitlebar@velitasali.github.io
         url: https://extensions.gnome.org/extension-data/gtktitlebarvelitasali.github.io.v2.shell-extension.zip
+      - id: switcher@landau.fi
+        url: https://extensions.gnome.org/extension-data/switcherlandau.fi.v25.shell-extension.zip
   when: gnome_shell_compatible_version is not failed
 
 - set_fact:
@@ -158,6 +160,22 @@
           - show-show-apps-button=true
           - show-showdesktop-button=false
           - show-window-previews=false
+
+      - name: Free <Super>Tab shortcut
+        dconf:
+          key: "/org/gnome/desktop/wm/keybindings/{{ item | regex_replace('=.*') }}"
+          value: "{{ item | regex_replace('.*=') }}"
+        loop:
+          - switch-applications-backward=@as []
+          - switch-applications=@as []
+
+      - name: Switcher change shortcut
+        dconf:
+          key: "/org/gnome/shell/extensions/switcher/{{ item | regex_replace('=.*') }}"
+          value: "{{ item | regex_replace('.*=') }}"
+        loop:
+          - show-switcher=['<Super>Tab']
+          - show-launcher=['<Super>x']
 
       tags:
         - extensions
