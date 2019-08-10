@@ -19,6 +19,9 @@
   tags: packages
   become: yes
 
+- import_tasks: random.yaml
+  tags: random
+
 - import_tasks: ssh.yaml
   tags: ssh
 

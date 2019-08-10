@@ -1,0 +1,6 @@
+---
+- name: Disable apport
+  systemd:
+    name: apport
+    enabled: no
+  become: yes
