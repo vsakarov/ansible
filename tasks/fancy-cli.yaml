@@ -40,3 +40,32 @@
     regexp: "alias fd=.*"
     line: alias fd=fdfind
     create: yes
+
+- name: Install jq
+  apt:
+    name: jq
+  become: yes
+
+# Install bat https://github.com/sharkdp/bat
+- name: Get deb url
+  shell: >
+      curl -s https://api.github.com/repos/sharkdp/bat/releases/latest
+      | jq '.assets|map(select(.content_type=="application/x-debian-package"))[].browser_download_url' -r
+      | grep -v musl
+      | grep amd64
+  args:
+    warn: false
+    creates: /usr/bin/bat
+  register: bat_deb_url
+
+- apt:
+    deb: "{{ bat_deb_url.stdout }}"
+  become: yes
+  when: bat_deb_url is changed
+
+- name: Add fzf-bat alias
+  lineinfile:
+    path: "{{ ansible_user_dir }}/.zsh_custom/alias.zsh"
+    regexp: "alias fzf-bat=.*"
+    line: alias fzf-bat="fzf --preview='bat --color always {}'"
+    create: yes
