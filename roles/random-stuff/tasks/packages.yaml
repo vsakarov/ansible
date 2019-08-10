@@ -7,10 +7,12 @@
       - build-essential
       - curl
       - exuberant-ctags
+      - fd-find
       - git
       - htop
       - mosh
       - nmap
+      - ripgrep
       - silversearcher-ag
       - tmux
       - tree
