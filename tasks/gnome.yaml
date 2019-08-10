@@ -161,13 +161,15 @@
           - show-showdesktop-button=false
           - show-window-previews=false
 
-      - name: Free <Super>Tab shortcut
+      - name: Rebind <Alt>Tab to switch applications and free <Super>Tab
         dconf:
           key: "/org/gnome/desktop/wm/keybindings/{{ item | regex_replace('=.*') }}"
           value: "{{ item | regex_replace('.*=') }}"
         loop:
-          - switch-applications-backward=@as []
-          - switch-applications=@as []
+          - switch-applications-backward=['<Shift><Alt>Tab']
+          - switch-applications=['<Alt>Tab']
+          - switch-windows-backward=@as []
+          - switch-windows=@as []
 
       - name: Switcher change shortcut
         dconf:
