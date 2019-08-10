@@ -2,9 +2,12 @@
   apt:
     name:
       - command-not-found
+      - fzf
       - zsh
   become: yes
-  tags: packages
+  tags:
+    - packages
+    - zsh
 
 - name: Clone oh-my-zsh
   git:
@@ -52,7 +55,6 @@
     insertbefore: source \$ZSH/oh-my-zsh.sh
   loop:
     - command-not-found
-    - fzf
     - jump
     - tmux
     - zsh-autosuggestions
@@ -77,22 +79,10 @@
     - { alias: 'j', value: 'jump' }
     - { alias: 'o', value: 'xdg-open' }
 
-- name: Clone fzf
-  git:
-    repo: https://github.com/junegunn/fzf
-    dest: "{{ ansible_user_dir }}/.fzf"
-    update: no
-  tags:
-    - configuration
-    - fzf
-
-# TODO: Don't depend on versioned url
-- name: Download fzf executable
-  unarchive:
-    src: https://github.com/junegunn/fzf-bin/releases/download/0.17.5/fzf-0.17.5-linux_amd64.tgz
-    dest: "{{ ansible_user_dir }}/.fzf/bin/"
-    remote_src: yes
-    creates: "{{ ansible_user_dir }}/.fzf/bin/fzf"
+- name: Remove manually installed fzf
+  file:
+    state: absent
+    path: "{{ ansible_user_dir }}/.fzf"
   tags:
     - configuration
     - fzf
@@ -100,21 +90,10 @@
 - name: Configure fzf loading
   copy:
     content: |
-      export FZF_HOME=~/.fzf/
-      # Setup fzf
-      # ---------
-      if [[ ! "$PATH" == *$FZF_HOME/bin* ]]; then
-        export PATH="$PATH:$FZF_HOME/bin"
-      fi
+      source /usr/share/doc/fzf/examples/key-bindings.zsh
 
-      # Auto-completion
-      # ---------------
-      [[ $- == *i* ]] && source "$FZF_HOME/shell/completion.zsh" 2> /dev/null
-
-      # Key bindings
-      # ------------
-      source "$FZF_HOME/shell/key-bindings.zsh"
-
+      # Auto completion: ls **<tab>
+      [[ $- == *i* ]] && source /usr/share/zsh/vendor-completions/_fzf 2> /dev/null
     dest: "{{ zsh_custom_directory }}/fzf.zsh"
     mode: 0644
   tags:
