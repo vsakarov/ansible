@@ -1,0 +1,31 @@
+# https://languagetool.org/
+# https://github.com/jsmestad/spacemacs-langtool
+---
+- setup:
+  when: ansible_user_dir is not defined
+
+- set_fact:
+    version: 4.6
+
+- name: Extract language tool
+  unarchive:
+    src: https://languagetool.org/download/LanguageTool-{{ version }}.zip
+    dest: "{{ ansible_user_dir }}/i"
+    creates: "{{ ansible_user_dir }}/i/LanguageTool-{{ version }}/"
+    remote_src: yes
+
+# (languagetool :variables
+#               langtool-language-tool-jar "{{ ansible_user_dir }}/i/LanguageTool-4.6/languagetool-commandline.jar")
+- name: Clone spacemacs-langtool
+  git:
+    repo: https://github.com/jsmestad/spacemacs-langtool
+    dest: "{{ ansible_user_dir }}/.emacs.d/private/languagetool"
+
+- name: Create languagetool-server.sh
+  copy:
+    content: |
+      #!/bin/bash
+      # runs on port 8081
+      java -cp ~/i/LanguageTool-{{ version }}/languagetool-server.jar org.languagetool.server.HTTPServer --allow-origin '*'
+    dest: "{{ ansible_user_dir }}/bin/languagetool-server.sh"
+    mode: 0755
