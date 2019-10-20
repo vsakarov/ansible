@@ -17,3 +17,10 @@
     update: no
   notify: Recreate fontconfig cache
   tags: configuration
+
+- name: Download Cascadia
+  get_url:
+    url: https://github.com/microsoft/cascadia-code/releases/download/v1910.04/Cascadia.ttf
+    dest: "{{ ansible_user_dir }}/.local/share/fonts/Cascadia.ttf"
+  notify: Recreate fontconfig cache
+  tags: configuration
