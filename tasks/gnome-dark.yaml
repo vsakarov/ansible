@@ -1,8 +1,0 @@
----
-- set_fact:
-    gnome_theme: Yaru-dark
-
-- name: Set gnome theme
-  dconf:
-    key: "/org/gnome/desktop/interface/gtk-theme"
-    value: "'{{ gnome_theme }}'"
