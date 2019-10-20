@@ -1,16 +1,17 @@
 # sudo true && ansible-playbook single.yaml --diff -e task=gnome --skip-tags extensions
 ---
 - name: Check gnome shell version
-  shell: "/usr/bin/gnome-shell --version | grep 3.32"
+  shell: "/usr/bin/gnome-shell --version | grep 3.34"
   register: gnome_shell_compatible_version
   changed_when: no
   check_mode: no
   ignore_errors: yes
 
 - set_fact:
+    # Extension urls should contain version to be able to make version check without downloading
     gnome_extensions:
       - id: dash-to-panel@jderose9.github.com
-        url: https://github.com/home-sweet-gnome/dash-to-panel/releases/download/v20/dash-to-panel@jderose9.github.com_v20.zip
+        url: https://extensions.gnome.org/extension-data/dash-to-paneljderose9.github.com.v23.shell-extension.zip
       # https://extensions.gnome.org/extension/1267/no-title-bar/
       - id: no-title-bar@franglais125.gmail.com
         url: https://extensions.gnome.org/extension-data/no-title-bar%40franglais125.gmail.com.v9.shell-extension.zip
@@ -20,6 +21,8 @@
         url: https://extensions.gnome.org/extension-data/gtktitlebarvelitasali.github.io.v2.shell-extension.zip
       - id: switcher@landau.fi
         url: https://extensions.gnome.org/extension-data/switcherlandau.fi.v25.shell-extension.zip
+      - id: sound-output-device-chooser@kgshank.net
+        url: https://extensions.gnome.org/extension-data/sound-output-device-chooserkgshank.net.v25.shell-extension.zip
   when: gnome_shell_compatible_version is not failed
 
 - set_fact:
@@ -27,12 +30,6 @@
   when: gnome_shell_compatible_version is failed
 
 - set_fact:
-    # TODO: auto generate from gnome_extensions
-    gnome_extensions_enabled:
-      - dash-to-panel@jderose9.github.com
-      - no-title-bar@franglais125.gmail.com
-      - gtktitlebar@velitasali.github.io
-
     gnome_favorite_apps:
       - 'firefox.desktop'
       - 'org.gnome.Terminal.desktop'
@@ -51,7 +48,7 @@
       - gnome-tweaks
       - network-manager-openvpn-gnome
       - python-psutil
-      # - python3-psutil
+      - python3-psutil
   become: yes
   when: gnome_stat.stat.exists
 
@@ -103,12 +100,26 @@
       - name: Install x11-utils for no title bar
         apt:
           name: x11-utils
-        # TODO: install only when installing no title bar
-        when: gnome_shell_compatible_version is not failed
+        when: "'no-title-bar' in gnome_extensions | json_query('[*].id') | join"
         become: yes
 
       - setup:
         when: ansible_user_dir is not defined
+
+      - name: Check installed extension directories
+        stat:
+          path: "{{ ansible_user_dir }}/.local/share/gnome-shell/extensions/{{ item.id }}/metadata.json"
+        loop: "{{ gnome_extensions | default([]) }}"
+        register: extention_metadata_stat
+      - name: Remove extensions with different version
+        file:
+          state: absent
+          path: "{{ item.invocation.module_args.path | dirname }}"
+        when:
+          - item.stat.exists
+          # FIXME: lookup user control machine, not remote
+          - "item.item.url.find('.v' + ((lookup('file', item.invocation.module_args.path, errors='ignore') | from_json)['version']|string) + '.') == -1"
+        loop: "{{ extention_metadata_stat.results }}"
 
       - name: Create GNOME extension directories
         file:
@@ -136,7 +147,7 @@
       - name: Enable extensions
         dconf:
           key: "/org/gnome/shell/enabled-extensions"
-          value: "{{ (gnome_extensions_enabled + gnome_extensions_current) | unique }}"
+          value: "{{ (gnome_extensions | json_query('[*].id') + gnome_extensions_current) | unique }}"
 
       - name: Dash to panel settings
         dconf:
