@@ -20,6 +20,6 @@
     - { name: alias.dw, value: diff --word-diff }
     - { name: alias.remove-merged, value: "!git branch --merged | grep -v 'master\\|^\\*' | xargs --no-run-if-empty git br -d" }
     - { name: alias.st, value: status }
-    - { name: color.ui, value: true }
+    - { name: color.ui, value: 'true' }
     - { name: push.default, value: simple }
   tags: configuration
