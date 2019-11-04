@@ -14,7 +14,7 @@
     # Extension urls should contain version to be able to make version check without downloading
     gnome_extensions:
       - id: dash-to-panel@jderose9.github.com
-        url: https://extensions.gnome.org/extension-data/dash-to-paneljderose9.github.com.v23.shell-extension.zip
+        url: https://extensions.gnome.org/extension-data/dash-to-paneljderose9.github.com.v25.shell-extension.zip
       # https://extensions.gnome.org/extension/1267/no-title-bar/
       - id: no-title-bar@franglais125.gmail.com
         url: https://extensions.gnome.org/extension-data/no-title-bar%40franglais125.gmail.com.v9.shell-extension.zip
@@ -90,7 +90,7 @@
     - name: Set some favorite apps to be easily accessible with Super-#
       dconf:
         key: "/org/gnome/shell/favorite-apps"
-        value: "{{ (gnome_favorite_apps + favorite_apps) | unique }}"
+        value: "{{ (gnome_favorite_apps + favorite_apps) | unique | string }}"
 
     - name: Disable media automount
       dconf:
@@ -162,7 +162,7 @@
       - name: Enable extensions
         dconf:
           key: "/org/gnome/shell/enabled-extensions"
-          value: "{{ (gnome_extensions | json_query('[*].id') + gnome_extensions_current) | unique }}"
+          value: "{{ (gnome_extensions | json_query('[*].id') + gnome_extensions_current) | unique | string }}"
 
       - name: Dash to panel settings
         dconf:
@@ -190,7 +190,7 @@
       - name: Rebind <Alt>Tab to switch applications and free <Super>Tab
         dconf:
           key: "/org/gnome/desktop/wm/keybindings/{{ item | regex_replace('=.*') }}"
-          value: "{{ item | regex_replace('.*=') }}"
+          value: "{{ item | regex_replace('.*=') | string }}"
         loop:
           - switch-applications-backward=['<Shift><Alt>Tab']
           - switch-applications=['<Alt>Tab']
@@ -200,7 +200,7 @@
       - name: Switcher change shortcut
         dconf:
           key: "/org/gnome/shell/extensions/switcher/{{ item | regex_replace('=.*') }}"
-          value: "{{ item | regex_replace('.*=') }}"
+          value: "{{ item | regex_replace('.*=') | string }}"
         loop:
           - show-switcher=['<Super>Tab']
           - show-launcher=['<Super>x']
