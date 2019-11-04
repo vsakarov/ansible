@@ -102,6 +102,41 @@
         key: "/org/gnome/settings-daemon/plugins/color/night-light-enabled"
         value: "true"
 
+    - name: Change background
+      dconf:
+        key: "/org/gnome/desktop/{{ item[0] }}/{{ item[1] | regex_replace('=.*') }}"
+        value: "{{ item[1] | regex_replace('.*=') }}"
+      with_nested:
+        - - background
+          - screensaver
+        - - draw-background=true
+          - picture-uri='file:////usr/share/gnome-control-center/pixmaps/noise-texture-light.png'
+          - color-shading-type='solid'
+          - primary-color='#252525'
+          - picture-options='wallpaper'
+          - secondary-color='#252525'
+
+    - name: Install vlc
+      apt:
+        name: vlc
+      become: yes
+    - name: Get video mime types
+      shell: grep MimeType /usr/share/applications/vlc.desktop | sed -e 's/;/\n/g' | grep ^video
+      register: video_mime_types
+      changed_when: no
+      check_mode: no
+    - name: Make vlc default video app
+      ini_file:
+        path: "{{ ansible_user_dir }}/.config/mimeapps.list"
+        section: Default Applications
+        option: "{{ item }}"
+        value: vlc.desktop
+        # backup: yes
+        create: no
+        no_extra_spaces: yes
+      loop: "{{ video_mime_types.stdout_lines }}"
+      when: video_mime_types is success
+
     # Extensions
     - block:
       - name: Remove ubuntu dock as it breaks dash-to-panel shortcuts
