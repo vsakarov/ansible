@@ -69,3 +69,20 @@
     regexp: "alias fzf-bat=.*"
     line: alias fzf-bat="fzf --preview='bat --color always {}'"
     create: yes
+
+# Install pet https://github.com/knqyf263/pet/
+- name: Get deb url
+  shell: >
+      curl -s https://api.github.com/repos/knqyf263/pet/releases/latest
+      | jq '.assets|map(select(.content_type=="application/x-debian-package"))[].browser_download_url' -r
+      | grep amd64
+  args:
+    warn: false
+    creates: /usr/local/bin/pet
+  register: pet_deb_url
+  tags: pet
+- apt:
+    deb: "{{ pet_deb_url.stdout }}"
+  become: yes
+  when: pet_deb_url is changed
+  tags: pet
