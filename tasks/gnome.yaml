@@ -4,33 +4,36 @@
 #  > sudo ansible localhost -i localhost, -c local -m ini_file -a 'path=/etc/ansible/facts.d/defaults.fact section=gnome option=favorite_apps value="[\"chromium-browser.desktop\"]"'
 ---
 - name: Check gnome shell version
-  shell: "/usr/bin/gnome-shell --version | grep 3.34"
+  shell: "/usr/bin/gnome-shell --version | grep 3.36"
   register: gnome_shell_compatible_version
   changed_when: no
   check_mode: no
   ignore_errors: yes
+  tags: extensions
 
 - set_fact:
     # Extension urls should contain version to be able to make version check without downloading
     gnome_extensions:
       - id: dash-to-panel@jderose9.github.com
-        url: https://extensions.gnome.org/extension-data/dash-to-paneljderose9.github.com.v25.shell-extension.zip
+        url: https://extensions.gnome.org/extension-data/dash-to-paneljderose9.github.com.v35.shell-extension.zip
       # https://extensions.gnome.org/extension/1267/no-title-bar/
       - id: no-title-bar@franglais125.gmail.com
         url: https://extensions.gnome.org/extension-data/no-title-bar%40franglais125.gmail.com.v9.shell-extension.zip
       # https://extensions.gnome.org/extension/1732/gtk-title-bar/
       # Use until no title bar is fixed for gnome 3.32
       - id: gtktitlebar@velitasali.github.io
-        url: https://extensions.gnome.org/extension-data/gtktitlebarvelitasali.github.io.v2.shell-extension.zip
+        url: https://extensions.gnome.org/extension-data/gtktitlebarvelitasali.github.io.v5.shell-extension.zip
       - id: switcher@landau.fi
-        url: https://extensions.gnome.org/extension-data/switcherlandau.fi.v25.shell-extension.zip
+        url: https://extensions.gnome.org/extension-data/switcherlandau.fi.v28.shell-extension.zip
       - id: sound-output-device-chooser@kgshank.net
-        url: https://extensions.gnome.org/extension-data/sound-output-device-chooserkgshank.net.v25.shell-extension.zip
+        url: https://extensions.gnome.org/extension-data/sound-output-device-chooserkgshank.net.v29.shell-extension.zip
   when: gnome_shell_compatible_version is not failed
+  tags: extensions
 
 - set_fact:
     gnome_extensions: []
   when: gnome_shell_compatible_version is failed
+  tags: extensions
 
 
 - setup:
@@ -50,14 +53,13 @@
   stat:
     path: /usr/bin/gnome-shell
   register: gnome_stat
+  tags: always
 
 - name: Install gnome tools
   apt:
     name:
       - dconf-editor
       - gnome-tweaks
-      - network-manager-openvpn-gnome
-      - python-psutil
       - python3-psutil
   become: yes
   when: gnome_stat.stat.exists
@@ -116,26 +118,36 @@
           - picture-options='wallpaper'
           - secondary-color='#252525'
 
-    - name: Install vlc
-      apt:
-        name: vlc
-      become: yes
-    - name: Get video mime types
-      shell: grep MimeType /usr/share/applications/vlc.desktop | sed -e 's/;/\n/g' | grep ^video
-      register: video_mime_types
-      changed_when: no
-      check_mode: no
-    - name: Make vlc default video app
-      ini_file:
-        path: "{{ ansible_user_dir }}/.config/mimeapps.list"
-        section: Default Applications
-        option: "{{ item }}"
-        value: vlc.desktop
-        # backup: yes
-        create: no
-        no_extra_spaces: yes
-      loop: "{{ video_mime_types.stdout_lines }}"
-      when: video_mime_types is success
+    # Make vlc default video player
+    - block:
+      - name: Install vlc
+        apt:
+          name: vlc
+        become: yes
+
+      - name: Get video mime types
+        shell: grep MimeType /usr/share/applications/vlc.desktop | sed -e 's/;/\n/g' | grep ^video
+        register: video_mime_types
+        changed_when: no
+        check_mode: no
+
+      - name: Check whether .config/mimeapps.list exists
+        stat:
+          path: "{{ ansible_user_dir }}/.config/mimeapps.list"
+        register: mimeapps_stat
+
+      - name: Make vlc default video app
+        ini_file:
+          path: "{{ ansible_user_dir }}/.config/mimeapps.list"
+          section: Default Applications
+          option: "{{ item }}"
+          value: vlc.desktop
+          # backup: yes
+          create: no
+          no_extra_spaces: yes
+        loop: "{{ video_mime_types.stdout_lines }}"
+        when: video_mime_types is success and mimeapps_stat.stat.exists
+      tags: vlc
 
     # Extensions
     - block:
