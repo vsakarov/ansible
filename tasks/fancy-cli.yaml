@@ -1,6 +1,7 @@
 ---
 - setup:
   when: ansible_user_dir is not defined
+  tags: always
 
 - name: Create zsh custom directories
   file:
@@ -47,7 +48,7 @@
   become: yes
 
 # Install bat https://github.com/sharkdp/bat
-- name: Get deb url
+- name: Get bat deb url
   shell: >
       curl -s https://api.github.com/repos/sharkdp/bat/releases/latest
       | jq '.assets|map(select(.content_type=="application/x-debian-package"))[].browser_download_url' -r
@@ -71,7 +72,7 @@
     create: yes
 
 # Install pet https://github.com/knqyf263/pet/
-- name: Get deb url
+- name: Get pet deb url
   shell: >
       curl -s https://api.github.com/repos/knqyf263/pet/releases/latest
       | jq '.assets|map(select(.content_type=="application/x-debian-package"))[].browser_download_url' -r
