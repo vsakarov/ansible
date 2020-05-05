@@ -36,8 +36,8 @@
       [Desktop Entry]
       Version=1.0
       Name=dupeGuru
-      Comment=Duplicate files finder
-      GenericName=dupeGuru
+      Comment=Duplicate finder
+      GenericName=Duplicate finder
       Exec=bash -c 'cd {{ dupeguru_dir }} && make run'
       Terminal=false
       X-MultipleArgs=false
