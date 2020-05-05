@@ -1,0 +1,45 @@
+# ansible-playbook single.yaml --diff -e task=dupeguru
+---
+- setup:
+  when: ansible_user_dir is not defined
+  tags: always
+
+- set_fact:
+    dupeguru_dir: "{{ ansible_user_dir }}/i/dupeguru"
+
+- name: Install python3 qt packages
+  apt:
+    name:
+      - gettext
+      - pyqt5-dev-tools
+      - python3-qtpy
+      - python3-venv
+  become: yes
+  tags: packages
+
+- name: Clone dupeguru repo
+  git:
+    repo: https://github.com/arsenetar/dupeguru
+    dest: "{{ dupeguru_dir }}"
+    update: no
+
+- name: Make dupeGuru
+  command: make
+  args:
+    chdir: "{{ dupeguru_dir }}"
+    creates: "{{ dupeguru_dir }}/env"
+
+- name: Create dupeguru desktop file
+  copy:
+    dest: "{{ ansible_user_dir }}/.local/share/applications/dupeGuru.desktop"
+    content: |
+      [Desktop Entry]
+      Version=1.0
+      Name=dupeGuru
+      Comment=Duplicate files finder
+      GenericName=dupeGuru
+      Exec=bash -c 'cd {{ dupeguru_dir }} && make run'
+      Terminal=false
+      X-MultipleArgs=false
+      Type=Application
+      Icon={{ dupeguru_dir }}/images/dgse_logo_128.png
