@@ -1,0 +1,78 @@
+# sudo true && ansible-playbook single.yml --diff -e task=microk8s -e allow_api_port=yes
+# sudo microk8s.inspect
+---
+- set_fact:
+    allow_api_port: no
+  tags: always
+
+- setup:
+  when: ansible_user_dir is not defined
+
+- name: Install snap packages
+  command: "snap install {{ item.name }} {{ item.options | default('') }}"
+  args:
+    chdir: /root
+    creates: "/snap/{{ item.name }}"
+  with_items:
+    - { name: 'microk8s', options: '--classic' }
+    - { name: 'kubectl', options: '--classic' }
+  become: yes
+  tags: snap
+
+# snap alias microk8s.docker docker
+
+- name: Use microk8s from kubectl
+  # shell: "/snap/bin/microk8s.kubectl config view --raw > $HOME/.kube/config"
+  shell: "/snap/bin/microk8s.config > $HOME/.kube/config"
+  args:
+    creates: "{{ ansible_user_dir }}/.kube/config"
+
+- name: Check addons status
+  shell: "/snap/bin/microk8s.status | grep ': disabled' | sed -e 's/:.*//'"
+  register: disabled_addons_output
+  changed_when: no
+  check_mode: no
+  become: yes
+  tags: addons
+
+- name: Enable addons
+  shell: "/snap/bin/microk8s.enable {{ item }}"
+  when: item in disabled_addons_output.stdout_lines
+  become: yes
+  loop:
+    - dns
+    - storage
+  tags: addons
+
+# https://tutorials.ubuntu.com/tutorial/install-a-local-kubernetes-with-microk8s#1
+# https://docs.ansible.com/ansible/latest/modules/ufw_module.html
+# sudo ufw allow in on cni0 && sudo ufw allow out on cni0
+# sudo ufw default allow routed
+
+- block:
+  - name: Allow iptables forwarding (pod-to-pod and pod-to-internet communication)
+    ufw:
+      default: allow
+      direction: routed
+
+  - name: Allow pod traffic
+    ufw:
+      rule: allow
+      interface: cni0
+      direction: "{{ item }}"
+    loop:
+      - in
+      - out
+
+  - name: "Allow kubernetes api port: {{ allow_api_port | bool }}"
+    ufw:
+      rule: allow
+      port: "16443"
+      # from_ip: 10.0.0.X
+      proto: tcp
+      comment: kubernetes api
+      delete: "{{ not (allow_api_port | bool) }}"
+  become: yes
+  tags:
+    - firewall
+    - ufw
