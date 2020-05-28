@@ -12,29 +12,43 @@
   become: yes
   tags: packages
 
-- name: Clone spacemacs
-  git:
-    repo: https://github.com/syl20bnr/spacemacs
-    dest: "{{ ansible_user_dir }}/.emacs.d"
-    update: no
+
+- block:
+    - name: Clone spacemacs
+      git:
+        repo: https://github.com/syl20bnr/spacemacs
+        dest: "{{ ansible_user_dir }}/.emacs.d"
+        version: develop
+        update: no
+
+    # force=no option of get_url is not working
+    # https://github.com/ansible/ansible/issues/64016
+    - name: Check whether .spacemacs exists
+      stat:
+        path: "{{ ansible_user_dir }}/.spacemacs"
+      register: spacemacs_stat
+
+    - name: Download .spacemacs
+      get_url:
+        url: "{{ dot_spacemacs_url }}"
+        dest: "{{ ansible_user_dir }}/.spacemacs"
+        force: no
+      when: not spacemacs_stat.stat.exists
   tags:
     - configuration
     - spacemacs
 
-- name: Download .spacemacs
-  get_url:
-    url: "{{ dot_spacemacs_url }}"
-    dest: "{{ ansible_user_dir }}/.spacemacs"
-    force: no
-  tags:
-    - configuration
-    - spacemacs
+- name: Check whether .vimrc exists
+  stat:
+    path: "{{ ansible_user_dir }}/.vimrc"
+  register: vimrc_stat
 
 - name: Download .vimrc
   get_url:
     url: "{{ dot_vimrc_url }}"
     dest: "{{ ansible_user_dir }}/.vimrc"
     force: no
+  when: not vimrc_stat.stat.exists
   tags:
     - configuration
     - vimrc

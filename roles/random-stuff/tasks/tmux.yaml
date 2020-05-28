@@ -33,10 +33,16 @@
 # set-environment -g TMUX_PLUGIN_MANAGER_PATH '{{ tmux_plugin_path_relative }}/'
 # run '{{ tmux_plugin_path_relative }}/tpm/tpm'
 
+- name: Check whether .tmux_conf exists
+  stat:
+    path: "{{ ansible_user_dir }}/.tmux.conf"
+  register: tmux_conf_stat
+
 - name: Download .tmux.conf
   get_url:
     url: "{{ dot_tmux_conf_url }}"
     dest: "{{ ansible_user_dir }}/.tmux.conf"
     force: no
+  when: not tmux_conf_stat.stat.exists
   tags:
     - configuration
