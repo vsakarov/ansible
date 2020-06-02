@@ -48,7 +48,7 @@
   become: yes
 
 # Install bat https://github.com/sharkdp/bat
-- name: Get bat deb url
+- name: Get bat deb url from github releases
   shell: >
       curl -s https://api.github.com/repos/sharkdp/bat/releases/latest
       | jq '.assets|map(select(.content_type=="application/x-debian-package"))[].browser_download_url' -r
@@ -72,7 +72,7 @@
     create: yes
 
 # Install pet https://github.com/knqyf263/pet/
-- name: Get pet deb url
+- name: Get pet deb url from github releases
   shell: >
       curl -s https://api.github.com/repos/knqyf263/pet/releases/latest
       | jq '.assets|map(select(.content_type=="application/x-debian-package"))[].browser_download_url' -r
@@ -87,3 +87,30 @@
   become: yes
   when: pet_deb_url is changed
   tags: pet
+
+# Install yamldiff https://github.com/sahilm/yamldiff/
+- name: Get yamldiff url from github releases
+  shell: >
+      curl -s https://api.github.com/repos/sahilm/yamldiff/releases/latest
+      | jq '.assets|map(select(.content_type=="application/octet-stream"))[].browser_download_url' -r
+      | grep linux-amd64
+  args:
+    warn: false
+    creates: "{{ ansible_user_dir }}/.local/bin/yamldiff"
+  register: yamldiff_url
+  tags: yamldiff
+- name: Download yamldiff
+  get_url:
+    url: "{{ yamldiff_url.stdout }}"
+    dest: "{{ ansible_user_dir }}/.local/bin/yamldiff"
+    mode: '0750'
+  when: yamldiff_url is changed
+  tags: yamldiff
+
+- name: Download minio client (mc)
+  get_url:
+    url: https://dl.min.io/client/mc/release/linux-amd64/mc
+    dest: "{{ ansible_user_dir }}/.local/bin/minio-client"
+    # checksum: 'sha256:231f9a902edbc7f35c4bb46583fbbeaeb960300f7585a74d82982caf5ddf68df'
+    mode: 0755
+  tags: minio
