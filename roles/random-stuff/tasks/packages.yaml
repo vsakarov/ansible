@@ -34,7 +34,26 @@
     chdir: /root
     creates: "/snap/{{ item.name }}"
   with_items:
-    - { name: 'spotify' }
+    - { name: 'languagetool' }
     - { name: 'skype', options: '--classic' }
+    - { name: 'spotify' }
+  become: yes
+  tags: snap
+
+- name: Get snap connections
+  command: "snap connections"
+  register: snap_connections_output
+  changed_when: no
+  check_mode: no
+  ignore_errors: yes
+  tags: snap
+
+- name: Remove snap connections
+  command: "snap disconnect {{ item.interface }}"
+  args:
+    chdir: /root
+  when: snap_connections_output.stdout.find(item.interface) != -1
+  with_items:
+    - { interface: 'languagetool:home' }
   become: yes
   tags: snap
