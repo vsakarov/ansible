@@ -24,7 +24,6 @@
     name:
       - chromium-browser
       - firefox
-      - fslint
       - meld
       - unison-gtk
       - vlc
