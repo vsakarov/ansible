@@ -6,9 +6,6 @@
       - fonts-symbola # required for custom floppy disc icon
       - neovim
       - silversearcher-ag
-      - sqlite3 # sqlite3 is needed by emacs' helm-dash
-      - vim
-      - vim-fugitive
   become: yes
   tags: packages
 
@@ -53,9 +50,9 @@
     - configuration
     - vimrc
 
-- name: Set vim as default editor
+- name: Set nvim as default editor
   alternatives:
     name: editor
-    path: /usr/bin/vim.basic
+    path: /usr/bin/nvim
   become: yes
   tags: configuration
