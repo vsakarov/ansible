@@ -1,3 +1,11 @@
+- name: Install all noto fonts
+  apt:
+    name: fonts-noto
+  become: yes
+  tags:
+    - noto
+    - never
+
 - name: Create fonts directory
   file:
     state: directory
@@ -20,7 +28,7 @@
 
 - name: Download Cascadia
   get_url:
-    url: https://github.com/microsoft/cascadia-code/releases/download/v1910.04/Cascadia.ttf
+    url: https://github.com/microsoft/cascadia-code/releases/download/v1911.21/Cascadia.ttf
     dest: "{{ ansible_user_dir }}/.local/share/fonts/Cascadia.ttf"
   notify: Recreate fontconfig cache
   tags: configuration
