@@ -2,27 +2,21 @@
   apt:
     name:
       - ansible
-      - aptitude
-      - arp-scan
       - build-essential
       - curl
-      - exuberant-ctags
       - fd-find
       - git
       - htop
-      - mosh
       - nmap
       - ripgrep
       - silversearcher-ag
       - tmux
       - tree
-      - vim
       - wget
 
 - name: Install desktop apps
   apt:
     name:
-      - chromium-browser
       - firefox
       - meld
       - unison-gtk
@@ -34,6 +28,7 @@
     chdir: /root
     creates: "/snap/{{ item.name }}"
   with_items:
+    - { name: 'chromium' }
     - { name: 'languagetool' }
     - { name: 'skype', options: '--classic' }
     - { name: 'spotify' }

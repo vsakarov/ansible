@@ -2,14 +2,17 @@
   file:
     state: absent
     path: /etc/apparmor.d/disable/usr.bin.firefox
-  tags:
-    - apparmor
   become: yes
+  tags:
+    - never
+    - apparmor
 
 - name: Find Firefox profile path
   find:
     paths: "{{ ansible_user_dir }}/.mozilla/firefox/"
-    patterns: "*default"
+    patterns:
+      - "*default"
+      - "*default-release"
     file_type: directory
   register: firefox_find
 

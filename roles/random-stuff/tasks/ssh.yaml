@@ -58,5 +58,5 @@
     notify: Restart ssh server
     tags: configuration
   become: yes
-  when: authorized_keys_stat.stat.exists
+  when: authorized_keys_stat is defined and authorized_keys_stat.stat.exists
   tags: sshd
