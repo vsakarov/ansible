@@ -1,0 +1,34 @@
+# sudo true && ansible-playbook single.yaml --diff -e task=vpn -e import_file='~/Downloads/*.ovpn'
+---
+- name: Install openvpn client tools
+  apt:
+    name:
+      - network-manager-openvpn-gnome
+  become: yes
+
+- set_fact:
+    import_file: "~/Downloads/*.ovpn"
+
+- set_fact:
+    import_file_path: "{{ (lookup('fileglob', import_file, wantlist=True) + ['']) | first }}"
+
+- fail:
+    msg: "File {{ import_file }} doesn't exist."
+  when: import_file_path == ''
+
+- debug:
+    msg: "Using {{ import_file_path }} for import"
+
+- set_fact:
+    vpn_name: "{{ import_file_path | basename | splitext | first }}"
+
+- name: Import vpn
+  shell: "nmcli connection import type openvpn file {{ import_file_path }}"
+  args:
+    chdir: /root
+    creates: "/etc/NetworkManager/system-connections/{{ vpn_name }}.nmconnection"
+  become: yes
+
+# Ask for password every time
+# cert-pass-flags=2
+# sudo ansible localhost -i localhost, -c local -m ini_file -a 'path=/etc/NetworkManager/system-connections/{{ vpn_name }}.nmconnection section=vpn option=cert-pass-flags value=2'
