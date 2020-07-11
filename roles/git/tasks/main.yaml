@@ -1,3 +1,6 @@
+# Change XXXXs bellow to add git user settings as ansible facts on this system, should be used only once
+# $ sudo ansible localhost -i localhost, -c local -m ini_file -a 'path=/etc/ansible/facts.d/defaults.fact section=user option=git_full_name value="XXXX XXXX"'
+# $ sudo ansible localhost -i localhost, -c local -m ini_file -a 'path=/etc/ansible/facts.d/defaults.fact section=user option=git_email value="XXXX@XXXX"'
 ---
 - name: Install git
   package:
@@ -19,7 +22,32 @@
     - { name: alias.di, value: diff }
     - { name: alias.dw, value: diff --word-diff }
     - { name: alias.remove-merged, value: "!git branch --merged | grep -v 'master\\|^\\*' | xargs --no-run-if-empty git br -d" }
+    - { name: alias.prune-branches, value: fetch origin --prune }
     - { name: alias.st, value: status }
     - { name: color.ui, value: 'true' }
+    - { name: core.excludesfile, value: "{{ ansible_user_dir }}/.gitignore" }
     - { name: push.default, value: simple }
   tags: configuration
+
+- name: Configure git user data
+  git_config:
+    name: "{{ item.name }}"
+    scope: global
+    value: "{{ ansible_local.defaults.user[item.value] }}"
+  loop:
+    - { name: user.name, value: git_full_name }
+    - { name: user.email, value: git_email }
+  when: |
+    ansible_local.defaults is defined
+    and ansible_local.defaults.user is defined
+    and ansible_local.defaults.user[item.value] is defined
+
+- name: Show git settings info
+  debug:
+    msg: Show git settings info
+  notify: No git settings
+  changed_when: |
+    ansible_local.defaults is defined
+    and ansible_local.defaults.user is defined
+    and (ansible_local.defaults.user.git_email is not defined
+         or ansible_local.defaults.user.git_full_name is not defined)
