@@ -30,7 +30,6 @@
   with_items:
     - { name: 'chromium' }
     - { name: 'languagetool' }
-    - { name: 'skype', options: '--classic' }
     - { name: 'spotify' }
   become: yes
   tags: snap

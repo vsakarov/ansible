@@ -45,6 +45,6 @@
     - 'user_pref("browser.newtabpage.activity-stream.prerender", false);'
     - 'user_pref("browser.newtabpage.activity-stream.showTopSites", false);'
     # Don't close window with last tab
-    - 'user_pref("browser.tabs.closeWindowWithLastTab", false);'
+    # - 'user_pref("browser.tabs.closeWindowWithLastTab", false);'
 
   when: firefox_find.matched != 0
