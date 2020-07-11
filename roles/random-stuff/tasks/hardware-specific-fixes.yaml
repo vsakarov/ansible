@@ -1,5 +1,6 @@
 ---
-- setup:
+- name: Get ansible_product_name
+  setup:
   when: ansible_product_name is not defined
   tags: packages
 
@@ -12,14 +13,16 @@
       name: intel-gpu-tools
     tags: packages
 
-  - copy:
+  - name: Create thinkpad pwm fix helper script
+    copy:
       content: |
         #!/bin/bash
         intel_reg read 0xC8254 | grep 12280000 && intel_reg write 0xC8254 0x3d103d1
       dest: /usr/local/bin/thinkpad-lcd-pwm-fix.sh
       mode: 0755
 
-  - copy:
+  - name: Create systemd service for thinkpad pwm fix
+    copy:
       content: |
         [Unit]
         Description=Increase LCD PWM rate
@@ -51,7 +54,8 @@
       checksum: sha256:c8225593ae74fc8048a985d610d42d441fc3a89c592c39f8bfeec3886c7bb4b8
       mode: 0755
 
-  - copy:
+  - name: Create systemd service for huawei sound fix
+    copy:
       content: |
         [Unit]
         Description=Huawei-soundfix

@@ -10,7 +10,7 @@
   replace:
     path: /etc/apt/apt.conf.d/50unattended-upgrades
     regexp: '.*{{ item | regex_escape() }}'
-    replace: "	{{ item }}"
+    replace: "\t{{ item }}"
   with_items:
     - '"${distro_id}:${distro_codename}-updates";'
     - '"${distro_id}:${distro_codename}-proposed";'

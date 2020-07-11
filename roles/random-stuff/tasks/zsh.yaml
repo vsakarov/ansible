@@ -14,6 +14,7 @@
   git:
     repo: https://github.com/ohmyzsh/ohmyzsh
     dest: "{{ ansible_user_dir }}/.oh-my-zsh"
+    version: master
     update: no
   tags:
     - configuration
@@ -34,7 +35,8 @@
   copy:
     content: |
       # This theme is copy of aussiegeek with zero width space at the end of the prompt used for tmux jumping
-      PROMPT='$fg_bold[blue][ $fg[red]%t $fg_bold[blue]] $fg_bold[blue] [ $fg[red]%n@%m:%~$(git_prompt_info)$fg[yellow]$(rvm_prompt_info)$fg_bold[blue] ]$reset_color 
+      NBSP=" "
+      PROMPT='$fg_bold[blue][ $fg[red]%t $fg_bold[blue]] $fg_bold[blue] [ $fg[red]%n@%m:%~$(git_prompt_info)$fg_bold[blue] ]$reset_color$NBSP
       $ '
       # git theming
       ZSH_THEME_GIT_PROMPT_PREFIX="$fg_bold[green]("
@@ -123,6 +125,7 @@
   git:
     repo: https://github.com/zsh-users/zsh-autosuggestions
     dest: "{{ ansible_user_dir }}/.zsh_custom/plugins/zsh-autosuggestions"
+    version: master
     update: no
   tags:
     - configuration

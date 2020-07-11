@@ -7,7 +7,8 @@
   become: yes
   tags: packages
 
-- set_fact:
+- name: Set tmux facts
+  set_fact:
     tmux_plugin_path: "{{ ansible_user_dir }}/.config/tmux-plugins"
     tmux_plugin_path_relative: "~/.config/tmux-plugins"
 
@@ -21,6 +22,7 @@
   git:
     repo: "{{ item }}"
     dest: "{{ tmux_plugin_path }}/{{ item | basename }}"
+    version: master
     update: no
   tags: configuration
   loop:

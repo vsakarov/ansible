@@ -14,7 +14,7 @@
 
 - fail:
     msg: "File {{ import_file }} doesn't exist."
-  when: import_file_path == ''
+  when: not import_file_path
 
 - debug:
     msg: "Using {{ import_file_path }} for import"
