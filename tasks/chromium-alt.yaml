@@ -1,0 +1,31 @@
+# sudo true && ansible-playbook single.yaml --diff -e task=chromium-alt --check
+---
+- name: Setup ansible_user_dir
+  setup:
+  when: ansible_user_dir is not defined
+
+- name: Set chromium_data_dir fact
+  set_fact:
+    chromium_data_dir: "{{ ansible_user_dir }}/i/chromium-alt"
+
+- name: Create {{ chromium_data_dir }}
+  file:
+    state: directory
+    path: "{{ chromium_data_dir }}"
+
+- name: Create desktop file
+  copy:
+    dest: "{{ ansible_user_dir }}/.local/share/applications/chromium-alt.desktop"
+    content: |
+      [Desktop Entry]
+      Version=1.0
+      Name=Chromium alt
+      Comment=Second chromium
+      GenericName=Alternative Web Browser
+      Exec=env BAMF_DESKTOP_FILE_HINT={{ ansible_user_dir }}/.local/share/applications/chromium-alt.desktop /snap/bin/chromium --class=chromium-alt --user-data-dir={{ chromium_data_dir }} %U
+      Terminal=false
+      X-MultipleArgs=false
+      Type=Application
+      Icon=www-browser
+      StartupWMClass=chromium-alt
+      StartupNotify=true
