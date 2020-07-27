@@ -1,0 +1,41 @@
+# ansible-playbook single.yaml --diff -e task=local-npm
+# https://github.com/sindresorhus/guides/blob/master/npm-global-without-sudo.md
+---
+- name: Setup ansible_user_dir
+  setup:
+    gather_subset: min
+  when: ansible_user_dir is not defined
+
+- name: Set playbook parameters
+  set_fact:
+    zsh_custom_dir: "{{ ansible_user_dir }}/.zsh_custom"
+
+- name: Install npm
+  apt:
+    name: npm
+  become: yes
+
+- name: Create {{ ansible_user_dir }}/.npm-packages directory
+  file:
+    state: directory
+    path: "{{ ansible_user_dir }}/.npm-packages"
+
+- name: Change npm config
+  lineinfile:
+    dest: "{{ ansible_user_dir }}/.npmrc"
+    line: "{{ item.key }}={{ item.value }}"
+    regexp: ".*{{ item.key }}="
+    create: yes
+  with_items:
+    # npm config set prefix "${HOME}/.npm-packages"
+    - { key: 'prefix', value: "{{ ansible_user_dir }}/.npm-packages" }
+
+- name: Create npm config for zsh
+  copy:
+    dest: "{{ ansible_user_dir }}/.zsh_custom/npm.zsh"
+    content: |
+      NPM_PACKAGES="${HOME}/.npm-packages"
+      export PATH="$PATH:$NPM_PACKAGES/bin"
+      # Preserve MANPATH if you already defined it somewhere in your config.
+      # Otherwise, fall back to `manpath` so we can inherit from `/etc/manpath`.
+      export MANPATH="${MANPATH-$(manpath)}:$NPM_PACKAGES/share/man"
