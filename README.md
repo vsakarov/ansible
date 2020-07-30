@@ -8,6 +8,7 @@ This repo contains playbooks for recreating my Ubuntu based workstation. May con
 ### From remote repo
 ```bash
 sudo add-apt-repository universe && sudo apt install ansible git
+export ANSIBLE_FORCE_COLOR=true
 sudo true && ansible-pull -U https://github.com/vsakarov/ansible/ break-stuff.yaml --tags XXXXX --check
 sudo true && ansible-pull -U https://github.com/vsakarov/ansible/ single.yaml -e task=XXXXX --check
 ```
