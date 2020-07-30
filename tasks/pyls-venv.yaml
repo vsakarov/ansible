@@ -1,0 +1,49 @@
+# sudo true && ansible-playbook single.yaml --diff -e task=pyls-venv
+---
+- name: Setup ansible_user_dir
+  setup:
+  when: ansible_user_dir is not defined
+  tags: always
+
+- name: Set common facts
+  set_fact:
+    zsh_custom_dir: "{{ ansible_user_dir }}/.zsh_custom"
+    venv_dir: "{{ ansible_user_dir }}/.virtualenvs"
+    venv_name: pyls
+    virtualenv_command: virtualenv
+    # virtualenv_command: /usr/bin/virtualenv --python {{ ansible_user_dir }}/.pyenv/versions/3.7.7/bin/python3.7
+
+- name: Install venv packages
+  apt:
+    name:
+      - virtualenv
+      - virtualenvwrapper
+  become: yes
+
+# https://develop.spacemacs.org/layers/+lang/python/README.html
+- name: Install python language server pips
+  pip:
+    name:
+      - autoflake
+      - epc
+      - flake8
+      - importmagic
+      - ipdb
+      - mccabe
+      - ptvsd
+      - pycodestyle
+      - pydocstyle
+      - pyflakes
+      - pylint
+      - pyls-black
+      - pyls-isort
+      - pyls-mypy
+      - python-language-server[all]
+      - requests
+      - rope
+      - setuptools
+      - virtualenv
+      - virtualenvwrapper
+      - yapf
+    virtualenv: "{{ venv_dir }}/{{ venv_name }}"
+    virtualenv_command: "{{ virtualenv_command }}"
