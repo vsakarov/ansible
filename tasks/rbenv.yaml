@@ -1,8 +1,11 @@
+# sudo true && ansible-playbook single.yaml --diff -e task=rbenv
 ---
-- setup:
+- name: Setup ansible_user_dir
+  setup:
   when: ansible_user_dir is not defined
 
-- set_fact:
+- name: Set common facts
+  set_fact:
     zsh_custom_directory: "{{ ansible_user_dir }}/.zsh_custom"
 
 - name: Clone rbenv
