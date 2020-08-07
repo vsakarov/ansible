@@ -10,8 +10,8 @@
     zsh_custom_dir: "{{ ansible_user_dir }}/.zsh_custom"
     venv_dir: "{{ ansible_user_dir }}/.virtualenvs"
     venv_name: pyls
-    virtualenv_command: virtualenv
-    # virtualenv_command: /usr/bin/virtualenv --python {{ ansible_user_dir }}/.pyenv/versions/3.7.7/bin/python3.7
+    python3_path: python3
+    # python3_path: "{{ ansible_user_dir }}/.pyenv/versions/3.7.7/bin/python3.7"
 
 - name: Install venv packages
   apt:
@@ -46,4 +46,5 @@
       - virtualenvwrapper
       - yapf
     virtualenv: "{{ venv_dir }}/{{ venv_name }}"
-    virtualenv_command: "{{ virtualenv_command }}"
+    virtualenv_command: virtualenv
+    virtualenv_python: "{{ python3_path }}"
