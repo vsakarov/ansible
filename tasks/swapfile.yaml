@@ -1,4 +1,4 @@
-# sudo true && ansible-playbook single.yml --diff -e task=swapfile -e swap_size=5120
+# sudo true && ansible-playbook single.yaml --diff -e task=swapfile -e swap_size=5120
 ---
 - set_fact:
     swapfile_path: /swapfile

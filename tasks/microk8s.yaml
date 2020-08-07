@@ -1,4 +1,4 @@
-# sudo true && ansible-playbook single.yml --diff -e task=microk8s -e allow_api_port=yes
+# sudo true && ansible-playbook single.yaml --diff -e task=microk8s -e allow_api_port=yes
 # sudo microk8s.inspect
 ---
 - set_fact:
