@@ -26,8 +26,6 @@
     update: no
   tags: configuration
   loop:
-    - https://github.com/tmux-plugins/tmux-copycat
-    - https://github.com/tmux-plugins/tmux-logging
     - https://github.com/tmux-plugins/tmux-open
     - https://github.com/tmux-plugins/tmux-yank
 
