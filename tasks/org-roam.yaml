@@ -1,0 +1,109 @@
+# https://www.orgroam.com/manual/
+# https://github.com/org-roam/org-roam/pull/133/files
+# TODO: add org-roam to dotspacemacs-configuration-layers
+---
+- setup:
+  when: ansible_user_dir is not defined
+  tags: always
+
+- name: Set local user facts
+  include_tasks:
+    file: local-user-facts.yaml
+    apply:
+      tags: always
+  tags: always
+
+- name: Org roam directory check
+  fail:
+    msg: |
+      ansible localhost -i localhost, -c local -m ini_file -a 'path=~/.ansible-facts.d/defaults.fact section=user option=org_roam_directory value="~/Notes"'
+  when: |
+    ansible_local.defaults is not defined
+    or ansible_local.defaults.user is not defined
+    or ansible_local.defaults.user["org_roam_directory"] is not defined
+  tags: always
+
+- set_fact:
+    org_roam_directory: "{{ ansible_local.defaults.user['org_roam_directory'] }}"
+  tags: always
+
+- name: Install org-roam dependencies
+  apt:
+    name:
+      - graphviz
+      - sqlite3
+  become: yes
+
+- name: Create org-roam layer folder
+  file:
+    state: directory
+    path: "{{ ansible_user_dir }}/.emacs.d/private/org-roam/"
+
+- name: Create sample org-roam layer
+  copy:
+    dest: "{{ ansible_user_dir }}/.emacs.d/private/org-roam/packages.el"
+    content: |
+      (defconst org-roam-packages
+        '((org-roam :location
+              (recipe :fetcher github :repo "org-roam/org-roam" :branch "master"))))
+      (defun org-roam/init-org-roam ()
+          (use-package org-roam
+              :after org
+              :hook
+              ((org-mode . org-roam-mode)
+              (after-init . org-roam--build-cache-async) ;; optional!
+              )
+              :custom
+              (org-roam-directory "{{ org_roam_directory }}")
+              :init
+              (progn
+                (require 'org-roam-protocol)
+                (spacemacs/declare-prefix "ar" "org-roam")
+                (spacemacs/set-leader-keys
+                  "arl" 'org-roam
+                  "art" 'org-roam-today
+                  "arf" 'org-roam-find-file
+                  "arg" 'org-roam-graph-show)
+                (spacemacs/declare-prefix-for-mode 'org-mode "mr" "org-roam")
+                (spacemacs/set-leader-keys-for-major-mode 'org-mode
+                  "rl" 'org-roam
+                  "rt" 'org-roam-today
+                  "rf" 'org-roam-find-file
+                  "ri" 'org-roam-insert
+                  "rg" 'org-roam-show-graph)
+                )))
+
+
+# https://www.orgroam.com/manual/How-do-I-have-more-than-one-Org_002droam-directory_003f.html
+- name: Create local config for multiple directories support
+  copy:
+    dest: "{{ org_roam_directory }}/.dir-locals.el"
+    content: |
+      ((nil . ((org-roam-directory . ".")
+              (org-roam-db-location . "./org-roam.db"))))
+
+# https://www.orgroam.com/manual/Installation-_00281_0029.html
+# TODO: To enable Org-roam's protocol extensions, you have to add the following to your init file:
+# (require 'org-roam-protocol)
+
+- name: Org protocol handler
+  copy:
+    dest: "{{ ansible_user_dir }}/.local/share/applications/org-protocol.desktop"
+    content: |
+      [Desktop Entry]
+      Name=Org-Protocol
+      Exec=emacsclient %u
+      Icon=emacs-icon
+      Type=Application
+      Terminal=false
+      MimeType=x-scheme-handler/org-protocol
+  tags: org-protocol
+
+- name: Associate org-protocol:// links with the desktop application
+  ini_file:
+    path: "{{ ansible_user_dir }}/.config/mimeapps.list"
+    section: Default Applications
+    option: x-scheme-handler/org-protocol
+    value: org-protocol.desktop
+    no_extra_spaces: yes
+  tags: org-protocol

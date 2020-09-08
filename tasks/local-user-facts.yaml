@@ -1,0 +1,12 @@
+# - name: Set local user facts
+#   include_tasks:
+#     file: local-user-facts.yaml
+#     apply:
+#       tags: always
+#   tags: always
+---
+- name: Gather local user facts
+  setup:
+    fact_path: "{{ ansible_user_dir }}/.ansible-facts.d"
+    filter: ansible_local
+    gather_subset: min
