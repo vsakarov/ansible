@@ -107,7 +107,7 @@
     - name: Change background
       dconf:
         key: "/org/gnome/desktop/{{ item[0] }}/{{ item[1] | regex_replace('=.*') }}"
-        value: "{{ item[1] | regex_replace('.*=') }}"
+        value: "{{ item[1] | regex_replace('^.*?=') }}"
       with_nested:
         - - background
           - screensaver
@@ -214,7 +214,7 @@
       - name: Dash to panel settings
         dconf:
           key: "/org/gnome/shell/extensions/dash-to-panel/{{ item | regex_replace('=.*') }}"
-          value: "{{ item | regex_replace('.*=') }}"
+          value: "{{ item | regex_replace('^.*?=') | string }}"
         with_items:
           - animate-show-apps=false
           - appicon-margin=0
@@ -237,7 +237,7 @@
       - name: Rebind <Alt>Tab to switch applications and free <Super>Tab
         dconf:
           key: "/org/gnome/desktop/wm/keybindings/{{ item | regex_replace('=.*') }}"
-          value: "{{ item | regex_replace('.*=') | string }}"
+          value: "{{ item | regex_replace('^.*?=') | string }}"
         loop:
           - switch-applications-backward=['<Shift><Alt>Tab']
           - switch-applications=['<Alt>Tab']
@@ -247,7 +247,7 @@
       - name: Switcher change shortcut
         dconf:
           key: "/org/gnome/shell/extensions/switcher/{{ item | regex_replace('=.*') }}"
-          value: "{{ item | regex_replace('.*=') | string }}"
+          value: "{{ item | regex_replace('^.*?=') | string }}"
         loop:
           - show-switcher=['<Super>Tab']
           - show-launcher=['<Super>x']
