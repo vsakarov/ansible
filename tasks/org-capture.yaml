@@ -1,0 +1,57 @@
+# TODO: set org-directory, org-default-notes-file and org-capture-templates in dotspacemacs/user-config
+---
+- setup:
+  when: ansible_user_dir is not defined
+  tags: always
+
+- name: Install org-protocol-capture-html dependencies
+  apt:
+    name:
+      - python3-psutil
+      - pandoc # org-protocol-capture-html requirement
+  become: yes
+
+- name: Org protocol handler
+  copy:
+    dest: "{{ ansible_user_dir }}/.local/share/applications/org-protocol.desktop"
+    content: |
+      [Desktop Entry]
+      Name=Org-Protocol
+      Exec=emacsclient %u
+      Icon=emacs-icon
+      Type=Application
+      Terminal=false
+      MimeType=x-scheme-handler/org-protocol
+  tags: org-protocol
+
+- name: Associate org-protocol:// links with the desktop application
+  ini_file:
+    path: "{{ ansible_user_dir }}/.config/mimeapps.list"
+    section: Default Applications
+    option: x-scheme-handler/org-protocol
+    value: org-protocol.desktop
+    no_extra_spaces: yes
+  tags: org-protocol
+
+- name: Check if custom0 keybinding is set
+  dconf:
+    key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/name"
+    state: read
+  register: dconf_keybinding_custom0
+  tags: always
+
+- name: Enable custom keybindings
+  dconf:
+    key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings"
+    value: "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
+  when: not dconf_keybinding_custom0.value
+
+- name: Bind <Super>c to org capture
+  dconf:
+    key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/{{ item | regex_replace('=.*') }}"
+    value: "{{ item | regex_replace('^.*?=') | string }}"
+  loop:
+    - binding='<Super>c'
+    - command="bash -c 'zenity --entry | (read && emacsclient \"org-protocol://capture?template=t&title=$REPLY\")'"
+    - name='org capture'
+  when: not dconf_keybinding_custom0.value

@@ -27,6 +27,13 @@
     org_roam_directory: "{{ ansible_local.defaults.user['org_roam_directory'] }}"
   tags: always
 
+- name: Include org capture playbook
+  include_tasks:
+    file: tasks/org-capture.yaml
+    apply:
+      tags: org-capture
+  tags: always
+
 - name: Install org-roam dependencies
   apt:
     name:
@@ -34,10 +41,13 @@
       - sqlite3
   become: yes
 
-- name: Create org-roam layer folder
+- name: Create org-roam directories
   file:
     state: directory
-    path: "{{ ansible_user_dir }}/.emacs.d/private/org-roam/"
+    path: "{{ item }}"
+  loop:
+    - "{{ ansible_user_dir }}/.emacs.d/private/org-roam/"
+    - "{{ org_roam_directory }}"
 
 - name: Create sample org-roam layer
   copy:
@@ -73,7 +83,6 @@
                   "rg" 'org-roam-show-graph)
                 )))
 
-
 # https://www.orgroam.com/manual/How-do-I-have-more-than-one-Org_002droam-directory_003f.html
 - name: Create local config for multiple directories support
   copy:
@@ -81,29 +90,3 @@
     content: |
       ((nil . ((org-roam-directory . ".")
               (org-roam-db-location . "./org-roam.db"))))
-
-# https://www.orgroam.com/manual/Installation-_00281_0029.html
-# TODO: To enable Org-roam's protocol extensions, you have to add the following to your init file:
-# (require 'org-roam-protocol)
-
-- name: Org protocol handler
-  copy:
-    dest: "{{ ansible_user_dir }}/.local/share/applications/org-protocol.desktop"
-    content: |
-      [Desktop Entry]
-      Name=Org-Protocol
-      Exec=emacsclient %u
-      Icon=emacs-icon
-      Type=Application
-      Terminal=false
-      MimeType=x-scheme-handler/org-protocol
-  tags: org-protocol
-
-- name: Associate org-protocol:// links with the desktop application
-  ini_file:
-    path: "{{ ansible_user_dir }}/.config/mimeapps.list"
-    section: Default Applications
-    option: x-scheme-handler/org-protocol
-    value: org-protocol.desktop
-    no_extra_spaces: yes
-  tags: org-protocol
