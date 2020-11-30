@@ -1,0 +1,89 @@
+---
+- setup:
+  when: ansible_user_dir is not defined
+  tags: always
+
+- set_fact:
+    rclonesync_version: 3.1
+    rclonesync_checksum: sha256:8d49b37e3342a37889c01ae6b7eea2e012f7ed6d4a73548c02fcdcb05c8ab460
+  tags: always
+
+- name: Install unison
+  apt:
+    name: unison
+  become: yes
+  tags: unison
+
+# Install https://github.com/rclone/rclone/
+- block:
+    - name: Get rclone deb url from github releases
+      shell: >
+          curl -s https://api.github.com/repos/rclone/rclone/releases/latest
+          | jq '.assets[].browser_download_url' -r
+          | grep linux-amd64.deb
+      args:
+        warn: false
+        creates: /usr/bin/rclone
+      register: rclone_deb_url
+
+    - name: Install rclone
+      apt:
+        deb: "{{ rclone_deb_url.stdout }}"
+      become: yes
+      when: rclone_deb_url is changed
+
+    # Two way sync
+    # https://forum.rclone.org/t/semi-rclone-bisync-two-way-sync-with-rclone-copy/8995
+    # https://github.com/rclone/rclone/wiki/Third-Party-Integrations-with-rclone
+    # https://rclone.org/overview/ is useful to see capabilities of different storage systems
+
+    # Good sync tool, but without track renames
+    - name: Download rclonesync
+      get_url:
+        url: https://raw.githubusercontent.com/cjnaz/rclonesync-V2/V{{ rclonesync_version }}/rclonesync
+        dest: "{{ ansible_user_dir }}/.local/bin/rclonesync"
+        mode: '0750'
+        checksum: "{{ rclonesync_checksum }}"
+
+    # https://github.com/Jwink3101/syncrclone
+    - name: Install syncrclone
+      pip:
+        name: git+https://github.com/Jwink3101/syncrclone
+        executable: pip3
+
+    - name: Syncrclone config directory
+      file:
+        state: directory
+        dest: "{{ ansible_user_dir }}/.syncrclone"
+    # syncrclone --new ~/.syncrclone/config.py
+
+  tags: rclone
+
+
+# Install https://github.com/restic/restic/
+- block:
+    - name: Get restic archive url from github releases
+      shell: >
+          curl -s https://api.github.com/repos/restic/restic/releases/latest
+          | jq '.assets[].browser_download_url' -r
+          | grep linux_amd64.bz2
+      args:
+        warn: false
+        creates: "{{ ansible_user_dir }}/.local/bin/restic"
+      register: restic_bz2_url
+
+    - name: Extract restic
+      shell: >
+          curl -Ls {{ restic_bz2_url.stdout }}
+          | bunzip2
+          > {{ ansible_user_dir }}/.local/bin/restic
+      args:
+        warn: false
+        creates: "{{ ansible_user_dir }}/.local/bin/restic"
+      when: restic_bz2_url is changed
+
+    - name: Make restic executable
+      file:
+        path: "{{ ansible_user_dir }}/.local/bin/restic"
+        mode: 0700
+  tags: restic
