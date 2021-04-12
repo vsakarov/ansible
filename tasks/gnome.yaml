@@ -115,7 +115,7 @@
           - picture-uri='file:////usr/share/gnome-control-center/pixmaps/noise-texture-light.png'
           - color-shading-type='solid'
           - primary-color='#252525'
-          - picture-options='wallpaper'
+          - picture-options='none'
           - secondary-color='#252525'
 
     # Make vlc default video player
