@@ -16,7 +16,7 @@
     - .local/share/fonts
   tags: configuration
 
-- name: Download source code pro
+- name: Download Source Code Pro font
   git:
     repo: https://github.com/adobe-fonts/source-code-pro
     version: release
@@ -26,9 +26,17 @@
   notify: Recreate fontconfig cache
   tags: configuration
 
-- name: Download Cascadia
+- name: Download Cascadia font
   get_url:
     url: https://github.com/microsoft/cascadia-code/releases/download/v1911.21/Cascadia.ttf
     dest: "{{ ansible_user_dir }}/.local/share/fonts/Cascadia.ttf"
   notify: Recreate fontconfig cache
   tags: configuration
+
+# # https://www.jetbrains.com/lp/mono/
+# - name: Download JetBrains Mono font
+#   unarchive:
+#     url: https://download.jetbrains.com/fonts/JetBrainsMono-2.225.zip
+#     dest: "{{ ansible_user_dir }}/.local/share/fonts/XXXX"
+#   notify: Recreate fontconfig cache
+#   tags: configuration
