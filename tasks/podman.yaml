@@ -1,0 +1,29 @@
+# https://podman.io
+# https://podman.io/getting-started/installation
+---
+- name: Install podman from apt
+  apt:
+    name:
+      - podman
+      - crun
+      - containers-storage
+  become: yes
+
+- name: Disable quay.io registry
+  ini_file:
+    path: /etc/containers/registries.conf
+    section: registries.search
+    option: registries
+    value: "['docker.io']"
+    create: no
+  become: yes
+
+- name: Disable quay.io registry
+  ini_file:
+    path: /etc/containers/containers.conf
+    section: engine
+    option: runtime
+    value: '"crun"'
+    create: no
+  become: yes
+
