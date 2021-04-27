@@ -1,6 +1,6 @@
 # sudo true && ansible-playbook single.yaml --diff -e task=gnome --skip-tags extensions
 #  # Set gnome theme settings as ansible facts on this system, should be used only once
-#  > sudo ansible localhost -i localhost, -c local -m ini_file -a 'path=/etc/ansible/facts.d/defaults.fact section=gnome option=theme value="Yaru"'
+#  > sudo ansible localhost -i localhost, -c local -m ini_file -a 'path=/etc/ansible/facts.d/defaults.fact section=gnome option=theme value="Yaru-dark"'
 #  > sudo ansible localhost -i localhost, -c local -m ini_file -a 'path=/etc/ansible/facts.d/defaults.fact section=gnome option=favorite_apps value="[\"chromium-browser.desktop\"]"'
 ---
 - name: Check gnome shell version
@@ -39,7 +39,7 @@
 - setup:
   when: ansible_local is not defined
 - set_fact:
-    gnome_theme: "{{ ansible_local.defaults.gnome.theme | default('Yaru-dark') }}"
+    gnome_theme: "{{ ansible_local.defaults.gnome.theme | default('Yaru') }}"
     gnome_favorite_apps:
       - 'firefox.desktop'
       - 'org.gnome.Terminal.desktop'
