@@ -1,0 +1,14 @@
+---
+- set_fact:
+    # https://www.terraform.io/downloads.html 
+    terraform_url: https://releases.hashicorp.com/terraform/0.15.1/terraform_0.15.1_linux_amd64.zip
+
+- setup:
+  when: ansible_user_dir is not defined
+
+- name: Install terraform
+  unarchive:
+    src: "{{ terraform_url }}"
+    dest: "{{ ansible_user_dir }}/.local/bin/"
+    creates: "{{ ansible_user_dir }}/.local/bin/terraform"
+    remote_src: yes
