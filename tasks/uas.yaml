@@ -1,0 +1,12 @@
+#  https://forum.odroid.com/viewtopic.php?t=31232
+# $ lsusb
+# Bus 002 Device 005: ID 152d:9561 JMicron Technology Corp. / JMicron USA Technology Corp.
+---
+- name: Add quirk for Orico sata to usb. Disable UAS.
+  lineinfile:
+    path: /etc/modprobe.d/quirks-uas.conf
+    line: options usb-storage quirks=152d:9561:u
+    create: yes
+  become: yes
+
+  # TODO: run: $ sudo update-initramfs -u
