@@ -1,0 +1,7 @@
+- name: Install yubikey text/gui tools
+  apt:
+    name:
+      - yubico-piv-tool
+      - yubikey-personalization-gui
+      - yubioath-desktop
+  become: yes
