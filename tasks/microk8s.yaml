@@ -55,10 +55,11 @@
       default: allow
       direction: routed
 
+  # WARNING:  Firewall is enabled. Consider allowing pod traffic with: sudo ufw allow in on vxlan.calico && sudo ufw allow out on vxlan.calico
   - name: Allow pod traffic
     ufw:
       rule: allow
-      interface: cni0
+      interface: vxlan.calico
       direction: "{{ item }}"
     loop:
       - in
