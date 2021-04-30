@@ -6,6 +6,13 @@
 - setup:
   when: ansible_user_dir is not defined
 
+- name: Include local user dirs
+  include_tasks:
+    file: local-user-dirs.yaml
+    apply:
+      tags: always
+  tags: always
+
 - name: Install terraform
   unarchive:
     src: "{{ terraform_url }}"

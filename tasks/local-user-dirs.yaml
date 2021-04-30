@@ -1,0 +1,11 @@
+---
+- setup:
+  when: ansible_user_dir is not defined
+  tags: always
+
+- name: Create local user directories
+  file:
+    state: directory
+    path: "{{ ansible_user_dir }}/{{ item }}"
+  with_items:
+    - .local/bin

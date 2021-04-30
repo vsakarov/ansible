@@ -8,6 +8,13 @@
     rclonesync_checksum: sha256:8d49b37e3342a37889c01ae6b7eea2e012f7ed6d4a73548c02fcdcb05c8ab460
   tags: always
 
+- name: Include local user dirs
+  include_tasks:
+    file: local-user-dirs.yaml
+    apply:
+      tags: always
+  tags: always
+
 - name: Install unison
   apt:
     name: unison
@@ -44,6 +51,11 @@
         dest: "{{ ansible_user_dir }}/.local/bin/rclonesync"
         mode: '0750'
         checksum: "{{ rclonesync_checksum }}"
+
+    - name: Install python3-pip
+      apt:
+        name: python3-pip
+      become: yes
 
     # https://github.com/Jwink3101/syncrclone
     - name: Install syncrclone

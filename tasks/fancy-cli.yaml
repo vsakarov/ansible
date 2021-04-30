@@ -11,6 +11,13 @@
     - .zsh_custom/
     - .zsh_custom/plugins/
 
+- name: Include local user dirs
+  include_tasks:
+    file: local-user-dirs.yaml
+    apply:
+      tags: minio
+  tags: always
+
 - name: Clone k
   git:
     repo: https://github.com/supercrabtree/k
@@ -51,9 +58,9 @@
 - name: Get bat deb url from github releases
   shell: >
       curl -s https://api.github.com/repos/sharkdp/bat/releases/latest
-      | jq '.assets|map(select(.content_type=="application/x-debian-package"))[].browser_download_url' -r
+      | jq '.assets|.[].browser_download_url' -r
       | grep -v musl
-      | grep amd64
+      | grep amd64.deb
   args:
     warn: false
     creates: /usr/bin/bat
