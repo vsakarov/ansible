@@ -1,12 +1,13 @@
 # https://podman.io
 # https://podman.io/getting-started/installation
+# sudo systemctl enable --now podman.socket
 ---
 - name: Install podman from apt
   apt:
     name:
       - podman
-      - crun
-      - containers-storage
+      # - crun
+      # - containers-storage
   become: yes
 
 - name: Disable quay.io registry
@@ -18,12 +19,11 @@
     create: no
   become: yes
 
-- name: Disable quay.io registry
-  ini_file:
-    path: /etc/containers/containers.conf
-    section: engine
-    option: runtime
-    value: '"crun"'
-    create: no
-  become: yes
-
+# - name: Use crun runtime
+#   ini_file:
+#     path: /etc/containers/containers.conf
+#     section: engine
+#     option: runtime
+#     value: '"crun"'
+#     create: no
+#   become: yes
