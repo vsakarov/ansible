@@ -1,5 +1,0 @@
----
-dot_tmux_conf_url: https://raw.githubusercontent.com/vsakarov/dotfiles/master/tmux.conf
-dot_zshrc_url: https://raw.githubusercontent.com/vsakarov/dotfiles/master/zshrc
-ssh_server_port: 2200
-zsh_custom_directory: "{{ ansible_user_dir }}/.zsh_custom"

@@ -1,7 +1,0 @@
----
-- name: No git settings
-  debug:
-    msg: |
-      # Change XXXXs bellow to add git user settings as ansible facts for {{ ansible_user_id }}
-      ansible localhost -i localhost, -c local -m ini_file -a 'path=~/.ansible-facts.d/defaults.fact section=git option=user.name value="XXXX XXXX"'
-      ansible localhost -i localhost, -c local -m ini_file -a 'path=~/.ansible-facts.d/defaults.fact section=git option=user.email value="XXXX@XXXX"'

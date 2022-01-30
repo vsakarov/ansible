@@ -3,6 +3,12 @@
   when: ansible_user_dir is not defined
   tags: always
 
+- name: Set {{ ansible_user_id }} home folder permissions
+  file:
+    state: directory
+    path: "{{ ansible_user_dir }}/"
+    mode: 0700
+
 - name: Create local user directories
   file:
     state: directory

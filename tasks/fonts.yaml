@@ -1,3 +1,6 @@
+- setup:
+  when: ansible_local is not defined
+
 - name: Install all noto fonts
   apt:
     name: fonts-noto
@@ -23,14 +26,12 @@
     depth: 1
     dest: "{{ ansible_user_dir }}/.local/share/fonts/source-code-pro"
     update: no
-  notify: Recreate fontconfig cache
   tags: configuration
 
 - name: Download Cascadia font
   get_url:
     url: https://github.com/microsoft/cascadia-code/releases/download/v1911.21/Cascadia.ttf
     dest: "{{ ansible_user_dir }}/.local/share/fonts/Cascadia.ttf"
-  notify: Recreate fontconfig cache
   tags: configuration
 
 # # https://www.jetbrains.com/lp/mono/
@@ -38,5 +39,8 @@
 #   unarchive:
 #     url: https://download.jetbrains.com/fonts/JetBrainsMono-2.225.zip
 #     dest: "{{ ansible_user_dir }}/.local/share/fonts/XXXX"
-#   notify: Recreate fontconfig cache
 #   tags: configuration
+
+# TODO: Execute on change
+- name: Recreate fontconfig cache
+  command: fc-cache

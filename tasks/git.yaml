@@ -1,4 +1,8 @@
+# sudo true && ansible-playbook single.yaml --diff -e task=git
 ---
+- setup:
+  when: ansible_local is not defined
+
 - name: Install git
   package:
     name: git
@@ -47,9 +51,11 @@
 
 - name: Show git settings info
   debug:
-    msg: Show git settings info
-  notify: No git settings
-  changed_when: |
+    msg: |
+      # Change XXXXs bellow to add git user settings as ansible facts for {{ ansible_user_id }}
+      ansible localhost -i localhost, -c local -m ini_file -a 'path=~/.ansible-facts.d/defaults.fact section=git option=user.name value="XXXX XXXX"'
+      ansible localhost -i localhost, -c local -m ini_file -a 'path=~/.ansible-facts.d/defaults.fact section=git option=user.email value="XXXX@XXXX"'
+  when: |
     ansible_local.defaults is not defined
     or ansible_local.defaults.git is not defined
     or ansible_local.defaults.git['user.name'] is not defined

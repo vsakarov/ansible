@@ -1,9 +1,0 @@
----
-- name: Recreate fontconfig cache
-  command: fc-cache
-
-- name: Restart ssh server
-  service:
-    name: ssh
-    state: restarted
-  become: yes

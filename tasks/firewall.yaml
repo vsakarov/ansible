@@ -1,8 +1,12 @@
 # https://docs.ansible.com/ansible/latest/modules/ufw_module.html
 ---
+- setup:
+  when: ansible_local is not defined
+
 - name: Enable ufw
   ufw:
     state: enabled
+  become: yes
 
 - name: Allow custom ssh port
   ufw:
@@ -10,3 +14,4 @@
     port: "2200"
     proto: tcp
     comment: custom ssh port
+  become: yes

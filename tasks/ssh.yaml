@@ -1,3 +1,9 @@
+- setup:
+  when: ansible_local is not defined
+
+- set_fact:
+    ssh_server_port: 2200
+
 - name: Install ssh packages
   apt:
     name:
@@ -55,8 +61,13 @@
       - { key: 'PasswordAuthentication', value: 'no' }
       - { key: 'PermitRootLogin', value: 'no' }
       - { key: 'Port', value: "{{ ssh_server_port }}" }
-    notify: Restart ssh server
     tags: configuration
+
+  # TODO: Execute on change
+  - name: Restart ssh server
+    service:
+      name: ssh
+      state: restarted
   become: yes
   when: authorized_keys_stat is defined and authorized_keys_stat.stat.exists
   tags: sshd
